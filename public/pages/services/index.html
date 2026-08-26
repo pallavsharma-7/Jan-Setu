@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jan-Setu | Departmental Services Catalog</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/pages/services/services.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Core Branch: <strong>pallav-core</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <div class="gov-emblem">JS</div>
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-online"><span class="status-indicator online"></span>CATALOG ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link active">Services</a>
+        <a href="/pages/application/" class="gov-nav-link">Apply (Tanishka)</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application (Palak)</a>
+        <a href="/pages/department/" class="gov-nav-link">Department Dashboard (Rucha)</a>
+        <a href="/pages/monitoring/" class="gov-nav-link">System Status (Parth)</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer" role="alert">
+      <div>
+        <strong>DISCLAIMER:</strong> This is a functional local prototype demonstrating interoperability and service orchestration between independent simulated departmental services.
+        It contains <strong>no connection to real government systems</strong> (Aadhaar, DigiLocker, Income Tax, real citizen records, or production infrastructure).
+      </div>
+    </div>
+
+    <!-- Page Header & Summary -->
+    <section class="services-header" aria-labelledby="catalog-title">
+      <h1 id="catalog-title">Departmental Services Catalog</h1>
+      <p>
+        Browse public services coordinated through Jan-Setu's simulated interoperability layer. Submit a single request with explicit consent, and Jan-Setu orchestrates parallel verification across participating department services without centralized storage.
+      </p>
+    </section>
+
+    <!-- Real-time Department Status Bar -->
+    <section class="dept-health-bar" aria-labelledby="dept-status-title">
+      <div class="dept-health-header">
+        <div class="dept-health-title" id="dept-status-title">
+          <span>🏛️</span>
+          <span>Prototype Department Services Health (Simulated)</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="refreshAll()" title="Refresh live status">Refresh Health Status</button>
+      </div>
+
+      <div class="dept-status-grid" id="dept-status-cards">
+        <div class="dept-status-card">
+          <div>
+            <div class="dept-status-card-name">Identity Service</div>
+            <div style="font-size: 0.72rem; color: var(--color-text-light);">Citizen ID Matching</div>
+          </div>
+          <span class="badge badge-online"><span class="status-indicator online"></span>ONLINE</span>
+        </div>
+        <div class="dept-status-card">
+          <div>
+            <div class="dept-status-card-name">Revenue Service</div>
+            <div style="font-size: 0.72rem; color: var(--color-text-light);">Address Validation</div>
+          </div>
+          <span class="badge badge-online"><span class="status-indicator online"></span>ONLINE</span>
+        </div>
+        <div class="dept-status-card">
+          <div>
+            <div class="dept-status-card-name">Tax Service</div>
+            <div style="font-size: 0.72rem; color: var(--color-text-light);">Tax Clearance</div>
+          </div>
+          <span class="badge badge-online"><span class="status-indicator online"></span>ONLINE</span>
+        </div>
+        <div class="dept-status-card">
+          <div>
+            <div class="dept-status-card-name">Municipal Service</div>
+            <div style="font-size: 0.72rem; color: var(--color-text-light);">Zoning & Trade</div>
+          </div>
+          <span class="badge badge-online"><span class="status-indicator online"></span>ONLINE</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog Controls: Search, Filter & Counter -->
+    <section class="catalog-controls" aria-label="Service Catalog Filters">
+      <div class="catalog-search-group">
+        <label for="service-search" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Search Services</label>
+        <input 
+          type="search" 
+          id="service-search" 
+          class="form-input" 
+          placeholder="Search services by title, keyword, or department..."
+          aria-label="Search services"
+        >
+      </div>
+
+      <div class="catalog-filter-group">
+        <label for="dept-filter" class="form-label" style="margin-bottom: 0; white-space: nowrap; font-size: 0.85rem;">Department:</label>
+        <select id="dept-filter" class="form-select" style="min-width: 180px; font-size: 0.85rem;" aria-label="Filter by department">
+          <option value="all">All Departments</option>
+          <option value="Municipal & Revenue">Municipal & Revenue</option>
+          <option value="Revenue Service">Revenue Service</option>
+          <option value="Municipal Service">Municipal Service</option>
+          <option value="Tax Service">Tax Service</option>
+        </select>
+      </div>
+
+      <div class="catalog-count" id="service-count">
+        Showing available services...
+      </div>
+    </section>
+
+    <!-- Services Grid (Dynamically Populated via GET /api/services) -->
+    <section class="services-grid" id="services-grid" aria-label="Available Services List">
+      <!-- Fallback static cards for prototype demonstration -->
+      <article class="catalog-card" id="service-business-reg">
+        <div>
+          <div class="catalog-card-header">
+            <div>
+              <span class="catalog-dept-badge">Municipal & Revenue</span>
+              <h2 class="catalog-service-name">Business Registration (Unified)</h2>
+            </div>
+            <span class="catalog-service-id">#business-reg</span>
+          </div>
+          <p class="catalog-service-desc">Single-window clearance for commercial enterprise registration across departments.</p>
+          <div class="catalog-details-box">
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Purpose:</span>
+              <span class="catalog-detail-value">Simulated single-window registration and commercial clearance for new enterprises.</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Coordinated Depts:</span>
+              <span class="catalog-detail-value">Identity Service • Revenue Service • Tax Service • Municipal Service</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Required Proofs:</span>
+              <span class="catalog-detail-value">Address Proof (.docx/.pdf), Business Name, Identity Verification</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Service Mode:</span>
+              <span class="catalog-detail-value"><span class="badge badge-online">Simulated Interoperability</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-card-footer">
+          <div class="flex gap-1">
+            <span class="badge badge-online"><span class="status-indicator online"></span>AVAILABLE FOR APPLICATION</span>
+          </div>
+          <div class="flex gap-1">
+            <a href="/pages/application/?serviceId=business-reg" class="btn btn-primary btn-sm">Apply Now &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="catalog-card" id="service-income-cert">
+        <div>
+          <div class="catalog-card-header">
+            <div>
+              <span class="catalog-dept-badge">Revenue Service</span>
+              <h2 class="catalog-service-name">Income Certificate Issuance</h2>
+            </div>
+            <span class="catalog-service-id">#income-cert</span>
+          </div>
+          <p class="catalog-service-desc">Revenue-verified annual income certificate generation.</p>
+          <div class="catalog-details-box">
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Purpose:</span>
+              <span class="catalog-detail-value">Issuance of revenue-verified annual household income certificate.</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Coordinated Depts:</span>
+              <span class="catalog-detail-value">Identity Service • Revenue Service</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Required Proofs:</span>
+              <span class="catalog-detail-value">Income Declaration, Residence Proof, Citizen Identity</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Service Mode:</span>
+              <span class="catalog-detail-value"><span class="badge badge-online">Simulated Interoperability</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-card-footer">
+          <div class="flex gap-1">
+            <span class="badge badge-online"><span class="status-indicator online"></span>AVAILABLE FOR APPLICATION</span>
+          </div>
+          <div class="flex gap-1">
+            <a href="/pages/application/?serviceId=income-cert" class="btn btn-primary btn-sm">Apply Now &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="catalog-card" id="service-trade-license">
+        <div>
+          <div class="catalog-card-header">
+            <div>
+              <span class="catalog-dept-badge">Municipal Service</span>
+              <h2 class="catalog-service-name">Trade License Renewal</h2>
+            </div>
+            <span class="catalog-service-id">#trade-license</span>
+          </div>
+          <p class="catalog-service-desc">Annual commercial clearance and operating permit renewal.</p>
+          <div class="catalog-details-box">
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Purpose:</span>
+              <span class="catalog-detail-value">Annual clearance and municipal operating permit renewal for commercial establishments.</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Coordinated Depts:</span>
+              <span class="catalog-detail-value">Municipal Service • Tax Service</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Required Proofs:</span>
+              <span class="catalog-detail-value">Establishment Lease, Safety Declaration, Prior License Number</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Service Mode:</span>
+              <span class="catalog-detail-value"><span class="badge badge-online">Simulated Interoperability</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-card-footer">
+          <div class="flex gap-1">
+            <span class="badge badge-online"><span class="status-indicator online"></span>AVAILABLE FOR APPLICATION</span>
+          </div>
+          <div class="flex gap-1">
+            <a href="/pages/application/?serviceId=trade-license" class="btn btn-primary btn-sm">Apply Now &rarr;</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="catalog-card" id="service-property-tax-clearance">
+        <div>
+          <div class="catalog-card-header">
+            <div>
+              <span class="catalog-dept-badge">Tax Service</span>
+              <h2 class="catalog-service-name">Property Tax Clearance</h2>
+            </div>
+            <span class="catalog-service-id">#property-tax-clearance</span>
+          </div>
+          <p class="catalog-service-desc">Unified property tax assessment and clearance certificate.</p>
+          <div class="catalog-details-box">
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Purpose:</span>
+              <span class="catalog-detail-value">Verification of municipal property tax assessment and issuance of clearance certificate.</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Coordinated Depts:</span>
+              <span class="catalog-detail-value">Tax Service • Revenue Service</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Required Proofs:</span>
+              <span class="catalog-detail-value">Property Assessment ID, Last Assessment Receipt</span>
+            </div>
+            <div class="catalog-detail-row">
+              <span class="catalog-detail-label">Service Mode:</span>
+              <span class="catalog-detail-value"><span class="badge badge-online">Simulated Interoperability</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-card-footer">
+          <div class="flex gap-1">
+            <span class="badge badge-online"><span class="status-indicator online"></span>AVAILABLE FOR APPLICATION</span>
+          </div>
+          <div class="flex gap-1">
+            <a href="/pages/application/?serviceId=property-tax-clearance" class="btn btn-primary btn-sm">Apply Now &rarr;</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Architecture Info Panel -->
+    <section class="services-info-panel" aria-labelledby="arch-info-title">
+      <h3 id="arch-info-title">How Service Verification Works</h3>
+      <p>
+        When you submit an application for any service above, Jan-Setu does not copy entire departmental database records. Instead, it dispatches simulated, purpose-bound verification calls (e.g. <code>POST /api/verify/identity</code>, <code>POST /api/verify/tax</code>) directly to the relevant department modules.
+      </p>
+      <p>
+        If any department is experiencing simulated maintenance (e.g. status is offline), the Jan-Setu gateway automatically places that specific verification in a failure queue without losing your application data.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+          Demonstrating federated data exchange and automated verification workflows.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Simulated Services</h4>
+        <ul>
+          <li>Identity Service (Online)</li>
+          <li>Revenue Service (Online)</li>
+          <li>Tax Service (Online)</li>
+          <li>Municipal Service (Online)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Built on core foundation branch <strong>pallav-core</strong>. Module: Services (Pathika).
+    </div>
+  </footer>
+
+  <!-- Core JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="/pages/services/services.js"></script>
+</body>
+</html>
