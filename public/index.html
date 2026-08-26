@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jan-Setu | Unified Interoperability Platform</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Core Branch: <strong>pallav-core</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <div class="gov-emblem">JS</div>
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-online"><span class="status-indicator online"></span>FOUNDATION ONLINE</span>
+      </div>
+    </div>
+
+    <!-- Common Navigation Structure -->
+    <nav class="gov-nav-bar">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link active">Jan-Setu Core</a>
+        <a href="#services-sec" class="gov-nav-link">Services (Pathika)</a>
+        <a href="#application-sec" class="gov-nav-link">Application (Tanishka)</a>
+        <a href="#tracking-sec" class="gov-nav-link">Track Application (Palak)</a>
+        <a href="#department-sec" class="gov-nav-link">Department Dashboard (Rucha)</a>
+        <a href="#monitoring-sec" class="gov-nav-link">System Status (Parth)</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer">
+      <div>
+        <strong>DISCLAIMER:</strong> This is a functional local prototype demonstrating interoperability and orchestration between independent simulated departmental services.
+        It contains <strong>no connection to real government systems</strong> (Aadhaar, DigiLocker, Income Tax, real citizen records, or production infrastructure).
+      </div>
+    </div>
+
+    <!-- Core Overview Section -->
+    <div class="grid grid-3 gap-4" style="margin-bottom: 1.5rem;">
+      <div class="gov-card" style="grid-column: span 2;">
+        <div class="gov-card-header">
+          <h2 class="gov-card-title">Jan-Setu Architecture & Interoperability Model</h2>
+          <span class="badge badge-completed">CORE FOUNDATION</span>
+        </div>
+        <div class="gov-card-body">
+          <p>
+            Jan-Setu provides a unified orchestration gateway connecting independent departmental services without creating a single centralized database. Each department owns its data, while Jan-Setu normalizes heterogeneous responses into a unified citizen record.
+          </p>
+          
+          <div class="grid grid-4 gap-2" style="margin-top: 1rem; text-align: center;">
+            <div style="background: var(--color-surface-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-light);">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--color-navy);">Identity Service</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Matches Citizen ID</div>
+            </div>
+            <div style="background: var(--color-surface-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-light);">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--color-navy);">Revenue Service</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Address Proof</div>
+            </div>
+            <div style="background: var(--color-surface-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-light);">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--color-navy);">Tax Service</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Tax Clearance</div>
+            </div>
+            <div style="background: var(--color-surface-alt); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-light);">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--color-navy);">Municipal Service</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Trade & Zoning</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Realtime Department Status Widget -->
+      <div class="gov-card">
+        <div class="gov-card-header">
+          <h3 class="gov-card-title" style="font-size: 1rem;">Department Services</h3>
+          <button class="btn btn-outline btn-sm" onclick="JanSetuUI.initStatusWidget()">Refresh</button>
+        </div>
+        <div class="gov-card-body" id="dept-status-widget">
+          <div style="text-align: center; color: var(--color-text-light); font-size: 0.85rem;">Loading status...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foundation Interactive Verification Console -->
+    <div class="gov-card">
+      <div class="gov-card-header">
+        <h2 class="gov-card-title">Core Foundation Verification Console</h2>
+        <span class="badge badge-pending">TEST HARNESS</span>
+      </div>
+      <div class="gov-card-body">
+        <p style="font-size: 0.88rem; margin-bottom: 1rem;">
+          Test the shared backend APIs, failure queue handling, audit logs, and response normalization directly:
+        </p>
+
+        <div class="flex flex-wrap gap-2" style="margin-bottom: 1.25rem;">
+          <button class="btn btn-primary btn-sm" onclick="testHealth()">1. Test Health (/api/health)</button>
+          <button class="btn btn-secondary btn-sm" onclick="testFetchApp('JS-2026-001')">2. Fetch App (JS-2026-001)</button>
+          <button class="btn btn-outline btn-sm" onclick="testRunVerification('tax', 'JS-2026-001')">3. Run Tax Verification</button>
+          <button class="btn btn-outline btn-sm" onclick="testRunVerification('municipal', 'JS-2026-001')">4. Run Municipal Verification</button>
+          <button class="btn btn-danger btn-sm" onclick="toggleService('tax', 'offline')">5. Set Tax Service OFFLINE</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleService('tax', 'online')">6. Set Tax Service ONLINE</button>
+          <button class="btn btn-outline btn-sm" onclick="testFetchAudit()">7. Fetch Audit Log</button>
+        </div>
+
+        <div style="background-color: #0f172a; color: #38bdf8; padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.85rem; max-height: 250px; overflow-y: auto;" id="console-output">
+          // Output logs will appear here when testing buttons above...
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Module Ownership Structure -->
+    <div class="gov-card">
+      <div class="gov-card-header">
+        <h2 class="gov-card-title">Team Module Ownership & Foundation Mapping</h2>
+      </div>
+      <div class="gov-card-body">
+        <div class="gov-table-container">
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Developer</th>
+                <th>Assigned Module</th>
+                <th>Foundation Integration Endpoints</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>PALLAV</strong></td>
+                <td>Core Architecture & Integration</td>
+                <td><code>server.js</code>, <code>routes.js</code>, <code>data.js</code>, Shared CSS/JS</td>
+                <td><span class="badge badge-online">FOUNDATION READY</span></td>
+              </tr>
+              <tr>
+                <td><strong>PATHIKA</strong></td>
+                <td>Home + Services Catalog</td>
+                <td><code>GET /api/services</code>, Shared Layout Header/Footer</td>
+                <td><span class="badge badge-pending">READY TO BUILD</span></td>
+              </tr>
+              <tr>
+                <td><strong>TANISHKA</strong></td>
+                <td>Application Form & Submission</td>
+                <td><code>POST /api/applications</code>, Shared Form Controls</td>
+                <td><span class="badge badge-pending">READY TO BUILD</span></td>
+              </tr>
+              <tr>
+                <td><strong>PALAK</strong></td>
+                <td>Documents Upload + Tracking UI</td>
+                <td><code>GET /api/applications/:id</code>, Document Schema</td>
+                <td><span class="badge badge-pending">READY TO BUILD</span></td>
+              </tr>
+              <tr>
+                <td><strong>RUCHA</strong></td>
+                <td>Department Dashboard + Audit Viewer</td>
+                <td><code>GET /api/audit</code>, Verification Action APIs</td>
+                <td><span class="badge badge-pending">READY TO BUILD</span></td>
+              </tr>
+              <tr>
+                <td><strong>PARTH</strong></td>
+                <td>Interoperability Monitoring & Health Controls</td>
+                <td><code>GET/POST /api/services/status</code>, Failure simulation</td>
+                <td><span class="badge badge-pending">READY TO BUILD</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Foundation Pages</h4>
+        <ul>
+          <li><a href="/">Core Console</a></li>
+          <li><a href="#services-sec">Services Catalog</a></li>
+          <li><a href="#tracking-sec">Application Tracker</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Mock Services</h4>
+        <ul>
+          <li>Identity Service (Online)</li>
+          <li>Revenue Service (Online)</li>
+          <li>Tax Service (Online)</li>
+          <li>Municipal Service (Online)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Built on core foundation branch <strong>pallav-core</strong>.
+    </div>
+  </footer>
+
+  <!-- Core JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+
+  <!-- Interactive Harness Script -->
+  <script>
+    const outputEl = document.getElementById('console-output');
+
+    function logToConsole(title, data) {
+      const time = new Date().toLocaleTimeString();
+      outputEl.innerHTML = `[${time}] === ${title} ===\n` + JSON.stringify(data, null, 2) + '\n\n' + outputEl.innerHTML;
+    }
+
+    async function testHealth() {
+      const res = await JanSetuAPI.getHealth();
+      logToConsole("GET /api/health Response", res);
+    }
+
+    async function testFetchApp(id) {
+      const res = await JanSetuAPI.getApplication(id);
+      logToConsole(`GET /api/applications/${id} Response`, res);
+    }
+
+    async function testRunVerification(dept, appId) {
+      let res;
+      if (dept === 'tax') res = await JanSetuAPI.verifyTax(appId);
+      if (dept === 'municipal') res = await JanSetuAPI.verifyMunicipal(appId);
+      logToConsole(`POST /api/verify/${dept} Response`, res);
+      // Re-fetch app details
+      setTimeout(() => testFetchApp(appId), 300);
+    }
+
+    async function toggleService(service, status) {
+      const res = await JanSetuAPI.updateServiceStatus(service, status);
+      logToConsole(`POST /api/services/status (${service} -> ${status})`, res);
+      JanSetuUI.initStatusWidget();
+    }
+
+    async function testFetchAudit() {
+      const res = await JanSetuAPI.getAudit();
+      logToConsole("GET /api/audit Response", res);
+    }
+  </script>
+</body>
+</html>

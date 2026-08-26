@@ -1,0 +1,23 @@
+{
+  "name": "jan-setu",
+  "version": "1.0.0",
+  "description": "Unified Interoperability & Service Orchestration Platform - Hackathon Foundation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "jan-setu",
+    "governance",
+    "interoperability",
+    "orchestration",
+    "prototype"
+  ],
+  "author": "PALLAV - Core Architect",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
