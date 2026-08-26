@@ -19,6 +19,16 @@
   let currentStep = 1;
   let isSubmitting = false;
   let submittedApplication = null;
+  let attachedDocuments = [
+    {
+      id: 'DOC-001',
+      name: 'AddressProof.docx',
+      type: 'docx',
+      size: '102 KB',
+      uploadState: 'uploaded',
+      verificationState: 'pending'
+    }
+  ];
 
   // DOM Elements
   const stepNodes = {
@@ -42,6 +52,12 @@
   const applicantNotesInput = document.getElementById('applicant-notes');
   const consentCheckbox = document.getElementById('consent-checkbox');
 
+  // Document Upload DOM Elements (Palak)
+  const docUploadDropzone = document.getElementById('doc-upload-dropzone');
+  const docFileInput = document.getElementById('doc-file-input');
+  const attachedDocsContainer = document.getElementById('attached-docs-container');
+  const attachedDocsCount = document.getElementById('attached-docs-count');
+
   // Error Messages
   const errorElements = {
     service: document.getElementById('err-service'),
@@ -49,7 +65,8 @@
     mobile: document.getElementById('err-mobile'),
     email: document.getElementById('err-email'),
     address: document.getElementById('err-address'),
-    consent: document.getElementById('err-consent')
+    consent: document.getElementById('err-consent'),
+    documents: document.getElementById('err-documents')
   };
 
   const generalErrorBanner = document.getElementById('general-error-banner');
@@ -86,6 +103,7 @@
   const reviewApplicantEmail = document.getElementById('review-applicant-email');
   const reviewApplicantAddress = document.getElementById('review-applicant-address');
   const reviewApplicantNotes = document.getElementById('review-applicant-notes');
+  const reviewApplicantDocs = document.getElementById('review-applicant-docs');
 
   // Confirmation Elements
   const confirmedAppId = document.getElementById('confirmed-app-id');
@@ -101,6 +119,8 @@
    */
   async function init() {
     setupEventListeners();
+    setupDocumentUploadHandlers();
+    renderAttachedDocuments();
     await loadServices();
     checkUrlParameters();
   }
@@ -174,13 +194,155 @@
     // Submit another application
     btnNewApplication.addEventListener('click', onResetApplication);
 
-    // Real-time error clearing
-    serviceSelect.addEventListener('change', () => clearFieldError('service'));
-    applicantNameInput.addEventListener('input', () => clearFieldError('name'));
-    applicantMobileInput.addEventListener('input', () => clearFieldError('mobile'));
-    applicantEmailInput.addEventListener('input', () => clearFieldError('email'));
-    applicantAddressInput.addEventListener('input', () => clearFieldError('address'));
-    consentCheckbox.addEventListener('change', () => clearFieldError('consent'));
+    // Setup Document Upload Handlers (Palak)
+    setupDocumentUploadHandlers();
+  }
+
+  /**
+   * Setup Document Upload Click and Drag/Drop Handlers (Palak)
+   */
+  function setupDocumentUploadHandlers() {
+    if (!docUploadDropzone || !docFileInput) return;
+
+    docUploadDropzone.addEventListener('click', () => {
+      docFileInput.click();
+    });
+
+    docUploadDropzone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        docFileInput.click();
+      }
+    });
+
+    docFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleDocumentFileUpload(e.target.files);
+        docFileInput.value = ''; // Reset input to allow selecting same file again
+      }
+    });
+
+    // Drag and Drop
+    ['dragenter', 'dragover'].forEach(eventName => {
+      docUploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        docUploadDropzone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      docUploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        docUploadDropzone.classList.remove('dragover');
+      });
+    });
+
+    docUploadDropzone.addEventListener('drop', (e) => {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleDocumentFileUpload(e.dataTransfer.files);
+      }
+    });
+  }
+
+  /**
+   * Handle Client-side Document Upload & Validation (Palak)
+   */
+  function handleDocumentFileUpload(fileList) {
+    clearFieldError('documents');
+    const allowedExtensions = ['pdf', 'docx', 'doc', 'jpg', 'jpeg', 'png'];
+    const maxSizeBytes = 5 * 1024 * 1024; // 5 MB
+    let addedCount = 0;
+
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(ext)) {
+        showFieldError('documents', `File "${file.name}" has an unsupported format. Allowed types: .pdf, .docx, .doc, .jpg, .png`);
+        return;
+      }
+
+      if (file.size > maxSizeBytes) {
+        showFieldError('documents', `File "${file.name}" exceeds the maximum allowed size of 5 MB.`);
+        return;
+      }
+
+      const formattedSize = window.JanSetuUI.formatFileSize(file.size);
+      const docId = `DOC-${Date.now().toString().slice(-3)}${i}`;
+
+      attachedDocuments.push({
+        id: docId,
+        name: file.name,
+        type: ext,
+        size: formattedSize,
+        uploadState: 'uploaded',
+        verificationState: 'pending'
+      });
+      addedCount++;
+    }
+
+    if (addedCount > 0) {
+      renderAttachedDocuments();
+    }
+  }
+
+  /**
+   * Remove an attached document (Palak)
+   */
+  window.removeAttachedDocument = function(index) {
+    if (index >= 0 && index < attachedDocuments.length) {
+      attachedDocuments.splice(index, 1);
+      renderAttachedDocuments();
+      if (attachedDocuments.length === 0) {
+        showFieldError('documents', 'Please attach at least one supporting document.');
+      } else {
+        clearFieldError('documents');
+      }
+    }
+  };
+
+  /**
+   * Render attached documents list in UI (Palak)
+   */
+  function renderAttachedDocuments() {
+    if (!attachedDocsContainer) return;
+
+    attachedDocsCount.textContent = attachedDocuments.length;
+
+    if (attachedDocuments.length === 0) {
+      attachedDocsContainer.innerHTML = `
+        <div style="text-align: center; color: var(--color-text-light); font-size: 0.82rem; padding: 0.75rem; border: 1px dashed var(--color-border); border-radius: var(--radius-sm);">
+          No documents attached yet. Click the upload box above to select your document proofs.
+        </div>
+      `;
+      return;
+    }
+
+    attachedDocsContainer.innerHTML = attachedDocuments.map((doc, idx) => {
+      const typeClass = `type-${escapeHtml(doc.type).toLowerCase()}`;
+      return `
+        <div class="attached-doc-item">
+          <div class="doc-info-left">
+            <span class="doc-type-badge ${typeClass}">${escapeHtml(doc.type)}</span>
+            <div class="doc-meta">
+              <div class="doc-name" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</div>
+              <div class="doc-sub">
+                <span>${escapeHtml(doc.size)}</span>
+                <span>&bull;</span>
+                <span style="color: var(--color-success, #15803d); font-weight: 600;">Uploaded (Simulated)</span>
+              </div>
+            </div>
+          </div>
+          <div class="doc-actions-right">
+            <button type="button" class="btn-remove-doc" onclick="removeAttachedDocument(${idx})" aria-label="Remove document ${escapeHtml(doc.name)}">
+              Remove
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   /**
@@ -190,6 +352,20 @@
     const selectedId = serviceSelect.value;
     const selectedService = services.find(s => s.id === selectedId);
     updateServiceSidebar(selectedService);
+
+    // Provide contextual default document if only sample default exists
+    if (attachedDocuments.length === 1 && (attachedDocuments[0].name === 'AddressProof.docx' || attachedDocuments[0].name.startsWith('Sample_'))) {
+      if (selectedId === 'income-cert') {
+        attachedDocuments = [{ id: 'DOC-001', name: 'IncomeProof_Form16.pdf', type: 'pdf', size: '180 KB', uploadState: 'uploaded', verificationState: 'pending' }];
+      } else if (selectedId === 'trade-license') {
+        attachedDocuments = [{ id: 'DOC-001', name: 'EstablishmentLease.pdf', type: 'pdf', size: '220 KB', uploadState: 'uploaded', verificationState: 'pending' }];
+      } else if (selectedId === 'property-tax-clearance') {
+        attachedDocuments = [{ id: 'DOC-001', name: 'PropertyTaxReceipt.pdf', type: 'pdf', size: '140 KB', uploadState: 'uploaded', verificationState: 'pending' }];
+      } else {
+        attachedDocuments = [{ id: 'DOC-001', name: 'AddressProof.docx', type: 'docx', size: '102 KB', uploadState: 'uploaded', verificationState: 'pending' }];
+      }
+      renderAttachedDocuments();
+    }
   }
 
   /**
@@ -243,6 +419,18 @@
     applicantEmailInput.value = 'aarav.sharma@example.com';
     applicantAddressInput.value = '42, Shanti Nagar, Ward 12, Pune, Maharashtra - 411001';
     applicantNotesInput.value = 'Demo business registration application for commercial services evaluation.';
+
+    attachedDocuments = [
+      {
+        id: 'DOC-001',
+        name: 'AddressProof.docx',
+        type: 'docx',
+        size: '102 KB',
+        uploadState: 'uploaded',
+        verificationState: 'pending'
+      }
+    ];
+    renderAttachedDocuments();
 
     if (!serviceSelect.value && services.length > 0) {
       serviceSelect.value = services[0].id;
@@ -316,6 +504,14 @@
       clearFieldError('address');
     }
 
+    // 6. Documents Validation (Palak)
+    if (attachedDocuments.length === 0) {
+      showFieldError('documents', 'Please attach at least one supporting document.');
+      isValid = false;
+    } else {
+      clearFieldError('documents');
+    }
+
     return isValid;
   }
 
@@ -343,6 +539,13 @@
     reviewApplicantAddress.textContent = applicantAddressInput.value.trim();
     reviewApplicantNotes.textContent = applicantNotesInput.value.trim() || 'None';
 
+    // Populate Attached Documents in Review (Palak)
+    if (reviewApplicantDocs) {
+      reviewApplicantDocs.innerHTML = attachedDocuments.map(d =>
+        `<div style="margin-bottom: 3px;"><strong>${escapeHtml(d.name)}</strong> (${escapeHtml(d.type.toUpperCase())}, ${escapeHtml(d.size)})</div>`
+      ).join('');
+    }
+
     goToStep(2);
   }
 
@@ -364,24 +567,34 @@
     if (isSubmitting) return;
 
     const selectedService = services.find(s => s.id === serviceSelect.value);
-const payload = {
-  serviceId: serviceSelect.value,
-  service: selectedService ? selectedService.name : 'Public Service Application',
+    const payload = {
+      serviceId: serviceSelect.value,
+      service: selectedService ? selectedService.name : 'Public Service Application',
 
-  applicantName: applicantNameInput.value.trim(),
-  applicantEmail: applicantEmailInput.value.trim(),
-  applicantPhone: applicantMobileInput.value.trim(),
+      applicantName: applicantNameInput.value.trim(),
+      applicantEmail: applicantEmailInput.value.trim(),
+      applicantPhone: applicantMobileInput.value.trim(),
 
-  applicant: {
-    name: applicantNameInput.value.trim(),
-    email: applicantEmailInput.value.trim(),
-    mobile: applicantMobileInput.value.trim(),
-    address: applicantAddressInput.value.trim()
-  },
+      applicant: {
+        name: applicantNameInput.value.trim(),
+        email: applicantEmailInput.value.trim(),
+        phone: applicantMobileInput.value.trim(),
+        mobile: applicantMobileInput.value.trim(),
+        address: applicantAddressInput.value.trim()
+      },
 
-  notes: applicantNotesInput.value.trim(),
-  consent: true
-};
+      documents: attachedDocuments.map(d => ({
+        id: d.id,
+        name: d.name,
+        type: d.type,
+        size: d.size,
+        uploadState: d.uploadState || 'uploaded',
+        verificationState: d.verificationState || 'pending'
+      })),
+
+      notes: applicantNotesInput.value.trim(),
+      consent: true
+    };
     // Set Submitting State
     setSubmittingState(true);
 
@@ -460,6 +673,17 @@ function displayConfirmation(app) {
     document.getElementById('application-form-step1').reset();
     consentCheckbox.checked = false;
     submittedApplication = null;
+    attachedDocuments = [
+      {
+        id: 'DOC-001',
+        name: 'AddressProof.docx',
+        type: 'docx',
+        size: '102 KB',
+        uploadState: 'uploaded',
+        verificationState: 'pending'
+      }
+    ];
+    renderAttachedDocuments();
     hideGeneralError();
     Object.keys(errorElements).forEach(clearFieldError);
     onServiceChange();

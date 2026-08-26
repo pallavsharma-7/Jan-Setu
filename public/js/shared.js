@@ -31,12 +31,14 @@ const JanSetuUI = {
     if (!status) return `<span class="badge badge-pending">PENDING</span>`;
     const s = String(status).toLowerCase();
     
-    if (s === 'online' || s === 'verified' || s === 'completed' || s === 'clear' || s === 'success') {
+    if (s === 'online' || s === 'verified' || s === 'completed' || s === 'clear' || s === 'success' || s === 'uploaded') {
       return `<span class="badge badge-online"><span class="status-indicator online"></span>${s.toUpperCase()}</span>`;
     } else if (s === 'offline' || s === 'rejected' || s === 'danger' || s === 'error') {
       return `<span class="badge badge-offline"><span class="status-indicator offline"></span>${s.toUpperCase()}</span>`;
     } else if (s === 'queued' || s === 'warning') {
       return `<span class="badge badge-queued"><span class="status-indicator queued"></span>${s.toUpperCase()}</span>`;
+    } else if (s === 'processing' || s === 'in_progress') {
+      return `<span class="badge badge-processing"><span class="status-indicator" style="background-color: var(--color-info);"></span>${s.toUpperCase()}</span>`;
     } else {
       return `<span class="badge badge-pending">${s.toUpperCase()}</span>`;
     }
@@ -51,6 +53,66 @@ const JanSetuUI = {
         ${title ? `<strong>${title}</strong> ` : ''}${message}
       </div>
     `;
+  },
+
+  /**
+   * Safe HTML escaping utility for citizen/API data rendering
+   */
+  escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
+
+  /**
+   * Copy text to clipboard with modern navigator API and textarea fallback
+   */
+  async copyToClipboard(text) {
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (err) {
+      console.warn('Clipboard API failed, using fallback:', err);
+    }
+
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return successful;
+    } catch (err) {
+      console.error('Fallback clipboard copy failed:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Format bytes or file size cleanly
+   */
+  formatFileSize(bytes) {
+    if (!bytes && bytes !== 0) return 'Unknown size';
+    if (typeof bytes === 'string' && (bytes.includes('KB') || bytes.includes('MB') || bytes.includes('B'))) {
+      return bytes;
+    }
+    const num = Number(bytes);
+    if (isNaN(num)) return String(bytes);
+    if (num < 1024) return `${num} B`;
+    if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+    return `${(num / (1024 * 1024)).toFixed(2)} MB`;
   },
 
   /**

@@ -61,6 +61,17 @@ router.get('/applications/:id', (req, res) => {
   res.json(app);
 });
 
+// 5b. POST /api/applications/:id/documents - Attach prototype document to application
+router.post('/applications/:id/documents', (req, res) => {
+  const appId = req.params.id;
+  const docData = req.body || {};
+  const result = data.addDocumentToApplication(appId, docData);
+  if (!result.success) {
+    return res.status(result.status || 400).json(result);
+  }
+  res.status(201).json(result);
+});
+
 // 6. POST /api/verify/identity - Invoke Identity Service verification
 router.post('/verify/identity', (req, res) => {
   const { applicationId } = req.body;
