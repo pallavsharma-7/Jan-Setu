@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Application | Jan-Setu Interoperability Prototype</title>
+  <meta name="description" content="Apply for public services through the Jan-Setu prototype interoperability and service orchestration layer.">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="stylesheet" href="application.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="site-top-bar" role="region" aria-label="Prototype Notice">
+    <div class="container site-top-bar-inner">
+      <div class="top-bar-badge">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Jan-Setu Prototype Interoperability Platform</span>
+      </div>
+      <div>
+        <span>Simulated Government Service Adapters &bull; Hackathon Demo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="main-header" role="banner">
+    <div class="container header-container">
+      <a href="/" class="brand-logo-group" aria-label="Jan-Setu Home">
+        <div class="brand-emblem" aria-hidden="true">JS</div>
+        <div class="brand-title-wrap">
+          <span class="brand-title">JAN-SETU</span>
+          <span class="brand-subtitle">Simulated Service Orchestration Layer</span>
+        </div>
+      </a>
+      <nav class="main-nav" aria-label="Primary Navigation">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/pages/services/" class="nav-link">Services Catalog</a>
+        <a href="/pages/application/" class="nav-link active" aria-current="page">Apply</a>
+        <a href="/pages/tracking/" class="nav-link">Track Status</a>
+        <a href="/pages/department/" class="nav-link">Department View</a>
+        <a href="/pages/monitoring/" class="nav-link">Monitoring</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-hero" aria-labelledby="page-title">
+    <div class="container">
+      <h1 id="page-title" class="page-hero-title">Citizen Service Application</h1>
+      <p class="page-hero-subtitle">
+        Apply for municipal, revenue, and commercial services. Jan-Setu coordinates minimum required data verification between simulated departmental adapters.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Application Form Area -->
+  <main class="container application-page-wrapper">
+
+    <!-- Step Progress Indicator -->
+    <nav class="step-indicator-bar" aria-label="Application Progress">
+      <ol class="steps-list" id="steps-list">
+        <li class="step-item active" id="step-node-1" aria-current="step">
+          <span class="step-circle">1</span>
+          <span class="step-title">1. Application Details</span>
+        </li>
+        <li class="step-item" id="step-node-2">
+          <span class="step-circle">2</span>
+          <span class="step-title">2. Review &amp; Consent</span>
+        </li>
+        <li class="step-item" id="step-node-3">
+          <span class="step-circle">3</span>
+          <span class="step-title">3. Confirmation</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- General Error Banner (Hidden by default) -->
+    <div id="general-error-banner" class="alert alert-danger" style="display: none;" role="alert" aria-live="polite">
+      <span aria-hidden="true">&bull;</span>
+      <span id="general-error-message">Unable to submit the application right now. Please check your information and try again.</span>
+    </div>
+
+    <!-- Application Form Layout -->
+    <div class="application-layout">
+
+      <!-- Left Column: Step Views -->
+      <div class="form-main-column">
+
+        <!-- ==========================================
+             STEP 1: APPLICATION & APPLICANT DETAILS
+             ========================================== -->
+        <section id="step-view-1" class="card" aria-labelledby="step1-heading">
+          <div class="card-header">
+            <h2 id="step1-heading" class="card-title">Step 1: Enter Application Information</h2>
+            <span class="badge badge-neutral">Required fields indicated with *</span>
+          </div>
+
+          <div class="card-body">
+            <!-- Demo Quick-Fill Bar -->
+            <div class="demo-helper-bar">
+              <span><strong>Testing Demo?</strong> Click to pre-fill verified sample citizen data:</span>
+              <button type="button" id="btn-fill-demo" class="demo-helper-btn" title="Populate with sample citizen Aarav Sharma">
+                Fill Demo Citizen (Aarav Sharma)
+              </button>
+            </div>
+
+            <form id="application-form-step1" novalidate>
+
+              <!-- Service Selection Fieldset -->
+              <fieldset class="form-section-fieldset">
+                <legend class="form-section-legend">Service Selection</legend>
+
+                <div class="form-group">
+                  <label for="service-select" class="form-label">
+                    Select Public Service <span class="required-indicator">*</span>
+                  </label>
+                  <select id="service-select" name="serviceId" class="form-control" required>
+                    <option value="">-- Choose a Simulated Service --</option>
+                  </select>
+                  <div id="err-service" class="field-error-msg" role="alert">Please select a service from the registry.</div>
+                  <div class="form-hint">Selected service determines which simulated departmental adapters will be orchestrated.</div>
+                </div>
+              </fieldset>
+
+              <!-- Applicant Details Fieldset -->
+              <fieldset class="form-section-fieldset">
+                <legend class="form-section-legend">Applicant Details (Demo Safe)</legend>
+
+                <div class="form-group">
+                  <label for="applicant-name" class="form-label">
+                    Full Legal Name <span class="required-indicator">*</span>
+                  </label>
+                  <input type="text" id="applicant-name" name="applicantName" class="form-control" placeholder="e.g. Aarav Sharma" required maxlength="100" autocomplete="name">
+                  <div id="err-name" class="field-error-msg" role="alert">Please enter the applicant full name.</div>
+                </div>
+
+                <div class="form-row-2col">
+                  <div class="form-group">
+                    <label for="applicant-mobile" class="form-label">
+                      Mobile Number <span class="required-indicator">*</span>
+                    </label>
+                    <input type="tel" id="applicant-mobile" name="applicantMobile" class="form-control" placeholder="e.g. 9876543210" required maxlength="10" autocomplete="tel">
+                    <div id="err-mobile" class="field-error-msg" role="alert">Please enter a valid 10-digit mobile number.</div>
+                    <div class="form-hint">Used for simulated SMS notifications and updates.</div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="applicant-email" class="form-label">
+                      Email Address <span class="form-hint" style="display:inline;">(Optional)</span>
+                    </label>
+                    <input type="email" id="applicant-email" name="applicantEmail" class="form-control" placeholder="e.g. aarav.sharma@example.com" maxlength="120" autocomplete="email">
+                    <div id="err-email" class="field-error-msg" role="alert">Please enter a valid email address.</div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="applicant-address" class="form-label">
+                    Premises / Residential Address <span class="required-indicator">*</span>
+                  </label>
+                  <textarea id="applicant-address" name="applicantAddress" class="form-control" rows="3" placeholder="e.g. 42, Shanti Nagar, Ward 12, Pune, Maharashtra - 411001" required></textarea>
+                  <div id="err-address" class="field-error-msg" role="alert">Please enter a complete premises address.</div>
+                  <div class="form-hint">Required for simulated municipal jurisdiction verification.</div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="applicant-notes" class="form-label">
+                    Application Purpose / Additional Notes <span class="form-hint" style="display:inline;">(Optional)</span>
+                  </label>
+                  <textarea id="applicant-notes" name="applicantNotes" class="form-control" rows="2" placeholder="e.g. Registration for new software development consultancy office"></textarea>
+                </div>
+              </fieldset>
+
+              <!-- Step 1 Navigation Buttons -->
+              <div class="form-step-actions">
+                <a href="/pages/services/" class="btn btn-secondary">&larr; Back to Services</a>
+                <button type="button" id="btn-to-step-2" class="btn btn-primary">
+                  Proceed to Review &amp; Consent &rarr;
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             STEP 2: REVIEW & MANDATORY CONSENT
+             ========================================== -->
+        <section id="step-view-2" class="card" style="display: none;" aria-labelledby="step2-heading">
+          <div class="card-header">
+            <h2 id="step2-heading" class="card-title">Step 2: Review Information &amp; Citizen Consent</h2>
+            <span class="badge badge-primary">Verification Stage</span>
+          </div>
+
+          <div class="card-body">
+            <div class="alert alert-info">
+              <div>
+                <strong>Data Minimization in Action:</strong> Please review your submitted details. Jan-Setu will only query simulated department adapters for attributes strictly required to process this specific service.
+              </div>
+            </div>
+
+            <!-- Review Summary Table -->
+            <h3 style="font-size: var(--font-size-base); margin-bottom: var(--space-3); color: var(--color-primary);">Application Summary</h3>
+            <table class="review-summary-table" aria-label="Application Summary">
+              <tbody>
+                <tr>
+                  <th scope="row">Selected Service</th>
+                  <td id="review-service-name">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Simulated Department</th>
+                  <td id="review-service-dept">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Applicant Name</th>
+                  <td id="review-applicant-name">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Mobile Number</th>
+                  <td id="review-applicant-mobile">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Email Address</th>
+                  <td id="review-applicant-email">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Address</th>
+                  <td id="review-applicant-address">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Application Purpose</th>
+                  <td id="review-applicant-notes">--</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Citizen Consent Section -->
+            <div class="consent-clause-panel">
+              <h4>Citizen Consent &amp; Prototype Authorization Notice</h4>
+              <p>
+                Jan-Setu operates as an interoperability coordination layer between simulated departmental services.
+              </p>
+              <ul style="margin-left: var(--space-4); margin-bottom: var(--space-3); font-size: var(--font-size-xs); color: #78350f;">
+                <li>Information is requested strictly for the purpose of processing this service application.</li>
+                <li>Participating services (Identity, Tax, Revenue, Municipal) are simulated adapters in this prototype.</li>
+                <li>This is a demonstration prototype and not a real government service transaction.</li>
+                <li>No real credentials, biometric data, or banking authorizations are accessed.</li>
+              </ul>
+            </div>
+
+            <!-- Consent Checkbox -->
+            <div class="consent-checkbox-wrap">
+              <label class="form-check" for="consent-checkbox">
+                <input type="checkbox" id="consent-checkbox" name="citizenConsent" class="form-check-input" required>
+                <span class="form-check-label">
+                  <strong>I consent to Jan-Setu requesting the minimum information required from participating simulated departmental services for this application.</strong> <span class="required-indicator">*</span>
+                </span>
+              </label>
+              <div id="err-consent" class="field-error-msg" role="alert" style="margin-left: 28px; margin-top: 6px;">
+                You must provide consent to submit this application to the Jan-Setu orchestration layer.
+              </div>
+            </div>
+
+            <!-- Step 2 Navigation Buttons -->
+            <div class="form-step-actions">
+              <button type="button" id="btn-back-to-step-1" class="btn btn-secondary">&larr; Edit Details</button>
+              <button type="button" id="btn-submit-application" class="btn btn-accent">
+                <span id="submit-btn-text">Submit Application &rarr;</span>
+                <span id="submit-btn-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             STEP 3: CONFIRMATION SCREEN
+             ========================================== -->
+        <section id="step-view-3" class="card" style="display: none;" aria-labelledby="step3-heading">
+          <div class="card-body confirmation-container">
+
+            <div class="confirmation-icon-circle" aria-hidden="true">&#10003;</div>
+
+            <h2 id="step3-heading" class="confirmation-title">Application Submitted Successfully</h2>
+            <p class="confirmation-subtitle">
+              Your application has been registered with the Jan-Setu coordination workflow. Participating simulated departmental services will process the verification requests.
+            </p>
+
+            <!-- Application ID Highlight Box -->
+            <div class="application-id-card">
+              <div class="application-id-label">Official Application Tracking ID</div>
+              <div class="application-id-value" id="confirmed-app-id">JS-2026-000</div>
+              <button type="button" id="btn-copy-app-id" class="copy-id-btn" aria-label="Copy Application ID to clipboard">
+                <span id="copy-btn-text">Copy Application ID</span>
+              </button>
+            </div>
+
+            <!-- Details Table -->
+            <div class="confirmation-details-card">
+              <div class="details-row">
+                <span class="details-label">Service:</span>
+                <span class="details-val" id="confirmed-service-name">--</span>
+              </div>
+              <div class="details-row">
+                <span class="details-label">Applicant Name:</span>
+                <span class="details-val" id="confirmed-applicant-name">--</span>
+              </div>
+              <div class="details-row">
+                <span class="details-label">Mobile Number:</span>
+                <span class="details-val" id="confirmed-applicant-mobile">--</span>
+              </div>
+              <div class="details-row">
+                <span class="details-label">Submission Status:</span>
+                <span class="details-val"><span class="badge badge-warning" id="confirmed-status">Processing</span></span>
+              </div>
+              <div class="details-row">
+                <span class="details-label">Submitted On:</span>
+                <span class="details-val" id="confirmed-date">--</span>
+              </div>
+            </div>
+
+            <!-- Next Actions -->
+            <div class="confirmation-actions">
+              <a href="/pages/tracking/" id="link-track-app" class="btn btn-primary">
+                Track Application Status &rarr;
+              </a>
+              <a href="/pages/services/" class="btn btn-secondary">
+                Back to Services
+              </a>
+              <button type="button" id="btn-new-application" class="btn btn-outline">
+                Submit Another Application
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Selected Service Summary Card -->
+      <aside class="sidebar-summary-card" aria-label="Selected Service Information">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title" style="font-size: var(--font-size-sm); text-transform: uppercase; letter-spacing: 0.5px;">Service Profile</h3>
+          </div>
+          <div class="card-body">
+            <div id="service-summary-empty" style="text-align: center; color: var(--color-text-muted); font-size: var(--font-size-xs); padding: var(--space-4) 0;">
+              Select a service from the form to view participating adapters and estimated turnaround.
+            </div>
+
+            <div id="service-summary-content" style="display: none;">
+              <span class="service-badge-pill" id="sidebar-service-category">Municipal</span>
+              <h4 id="sidebar-service-name" style="font-size: var(--font-size-base); color: var(--color-primary); margin-bottom: 4px;">--</h4>
+              <p id="sidebar-service-dept" style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-bottom: var(--space-3);">--</p>
+              <p id="sidebar-service-desc" style="font-size: var(--font-size-xs); color: var(--color-text-muted); line-height: 1.5; margin-bottom: var(--space-4);">--</p>
+
+              <div style="font-size: var(--font-size-xs); margin-bottom: var(--space-3);">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+                  <span style="color: var(--color-text-muted);">Simulated Fee:</span>
+                  <strong id="sidebar-service-fee">--</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="color: var(--color-text-muted);">Est. Turnaround:</span>
+                  <strong id="sidebar-service-time">--</strong>
+                </div>
+              </div>
+
+              <!-- Participating Adapters -->
+              <h5 style="font-size: var(--font-size-xs); text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.5px; margin-top: var(--space-4);">
+                Orchestrated Adapters
+              </h5>
+              <ul class="adapters-list" id="sidebar-adapters-list">
+                <!-- Populated dynamically -->
+              </ul>
+
+              <!-- Data Minimization Notice -->
+              <div class="data-minimization-box">
+                <strong>Data Minimization Notice</strong>
+                <span id="sidebar-data-minimization-text">Only the minimum attributes required for this service are queried from simulated department adapters.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <h4>JAN-SETU</h4>
+          <p>
+            An interoperability and service-orchestration prototype connecting simulated departmental verification adapters to eliminate repetitive citizen paperwork.
+          </p>
+          <div class="prototype-notice-tag">
+            Simulated Prototype &bull; No Real Government Affiliation
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Platform Navigation</h5>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/pages/services/">Services Catalog</a></li>
+            <li><a href="/pages/application/">Application Flow</a></li>
+            <li><a href="/pages/tracking/">Application Tracking</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Department Adapters</h5>
+          <ul>
+            <li><a href="/pages/department/">Identity Verification Service</a></li>
+            <li><a href="/pages/department/">Revenue Verification Service</a></li>
+            <li><a href="/pages/department/">Tax Verification Service</a></li>
+            <li><a href="/pages/department/">Municipal Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Jan-Setu Project. Built for demonstration and simulated public service interoperability.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/shared.js"></script>
+  <script src="application.js"></script>
+</body>
+</html>
