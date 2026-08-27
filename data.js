@@ -49,13 +49,49 @@ const availableServices = [
 // Audit Event Log Storage
 let auditLogs = [
   {
-    id: "AUD-1001",
-    timestamp: "2026-08-26 10:00:05",
+    id: "AUD-1007",
+    timestamp: "2026-08-26 14:15:15",
+    department: "Tax Service",
+    request: "Tax Compliance Check",
+    purpose: "Commercial tax clearance for Trade License",
+    result: "Queued (Pending Sync)",
+    applicationId: "JS-2026-003"
+  },
+  {
+    id: "AUD-1006",
+    timestamp: "2026-08-26 14:15:04",
     department: "Identity Service",
     request: "Citizen Identity Verification",
-    purpose: "Initial application verification",
+    purpose: "Trade license renewal identity check",
     result: "Verified",
-    applicationId: "JS-2026-001"
+    applicationId: "JS-2026-003"
+  },
+  {
+    id: "AUD-1005",
+    timestamp: "2026-08-26 11:30:20",
+    department: "Tax Service",
+    request: "Tax Compliance Check",
+    purpose: "Income verification against tax filings",
+    result: "Verified (Clear)",
+    applicationId: "JS-2026-002"
+  },
+  {
+    id: "AUD-1004",
+    timestamp: "2026-08-26 11:30:12",
+    department: "Revenue Service",
+    request: "Residence Status Verification",
+    purpose: "Address validation for Income Certificate",
+    result: "Verified",
+    applicationId: "JS-2026-002"
+  },
+  {
+    id: "AUD-1003",
+    timestamp: "2026-08-26 11:30:05",
+    department: "Identity Service",
+    request: "Citizen Identity Verification",
+    purpose: "Income certificate issuance validation",
+    result: "Verified",
+    applicationId: "JS-2026-002"
   },
   {
     id: "AUD-1002",
@@ -63,6 +99,15 @@ let auditLogs = [
     department: "Revenue Service",
     request: "Residence Status Verification",
     purpose: "Address validation for Business Registration",
+    result: "Verified",
+    applicationId: "JS-2026-001"
+  },
+  {
+    id: "AUD-1001",
+    timestamp: "2026-08-26 10:00:05",
+    department: "Identity Service",
+    request: "Citizen Identity Verification",
+    purpose: "Initial application verification",
     result: "Verified",
     applicationId: "JS-2026-001"
   }
@@ -110,10 +155,95 @@ let applications = {
     ],
     createdAt: "2026-08-26T10:00:00Z",
     updatedAt: "2026-08-26T10:00:15Z"
+  },
+  "JS-2026-002": {
+    id: "JS-2026-002",
+    service: "Income Certificate Issuance",
+    serviceId: "income-cert",
+    applicant: {
+      name: "Priya Patel",
+      email: "priya.patel@example.gov.in",
+      phone: "+91 98234 56789"
+    },
+    status: "completed",
+    consent: true,
+    documents: [
+      {
+        id: "DOC-002",
+        name: "SalarySlip_Form16.pdf",
+        type: "pdf",
+        size: "245 KB",
+        uploadState: "uploaded",
+        verificationState: "verified"
+      }
+    ],
+    verifications: {
+      identity: "verified",
+      address: "verified",
+      tax: "verified",
+      municipal: "verified"
+    },
+    verificationResults: {
+      identity: { name: "Priya Patel", verified: true },
+      address: { applicantName: "Priya Patel", residenceVerified: true },
+      tax: { citizen_name: "Priya Patel", taxStatus: "clear" },
+      municipal: { citizenName: "Priya Patel", zoneApproved: true, propertyTaxStatus: "cleared" }
+    },
+    timeline: [
+      { timestamp: "2026-08-26 11:30:00", department: "Jan-Setu Gateway", action: "Application Created", detail: "Consent captured. Interoperability orchestration initiated." },
+      { timestamp: "2026-08-26 11:30:05", department: "Identity Service", action: "Identity Check", detail: "Citizen record matched & verified." },
+      { timestamp: "2026-08-26 11:30:12", department: "Revenue Service", action: "Address Check", detail: "Residence status confirmed against local revenue records." },
+      { timestamp: "2026-08-26 11:30:20", department: "Tax Service", action: "Tax Clearance", detail: "Tax filing verified and cleared." },
+      { timestamp: "2026-08-26 11:30:25", department: "Municipal Service", action: "Municipal Clearance", detail: "Zoning approved & municipal dues cleared." }
+    ],
+    createdAt: "2026-08-26T11:30:00Z",
+    updatedAt: "2026-08-26T11:30:25Z"
+  },
+  "JS-2026-003": {
+    id: "JS-2026-003",
+    service: "Trade License Renewal",
+    serviceId: "trade-license",
+    applicant: {
+      name: "Vikram Malhotra",
+      email: "vikram.m@example.gov.in",
+      phone: "+91 97123 45678"
+    },
+    status: "queued",
+    consent: true,
+    documents: [
+      {
+        id: "DOC-003",
+        name: "ShopLeaseAgreement.pdf",
+        type: "pdf",
+        size: "380 KB",
+        uploadState: "uploaded",
+        verificationState: "pending"
+      }
+    ],
+    verifications: {
+      identity: "verified",
+      address: "verified",
+      tax: "queued",
+      municipal: "pending"
+    },
+    verificationResults: {
+      identity: { name: "Vikram Malhotra", verified: true },
+      address: { applicantName: "Vikram Malhotra", residenceVerified: true },
+      tax: null,
+      municipal: null
+    },
+    timeline: [
+      { timestamp: "2026-08-26 14:15:00", department: "Jan-Setu Gateway", action: "Application Created", detail: "Consent captured. Interoperability orchestration initiated." },
+      { timestamp: "2026-08-26 14:15:04", department: "Identity Service", action: "Identity Check", detail: "Citizen record matched & verified." },
+      { timestamp: "2026-08-26 14:15:10", department: "Revenue Service", action: "Address Check", detail: "Residence status confirmed against local revenue records." },
+      { timestamp: "2026-08-26 14:15:15", department: "Tax Service", action: "Verification Queued", detail: "Tax Service sync delayed. Request placed in resilient queue." }
+    ],
+    createdAt: "2026-08-26T14:15:00Z",
+    updatedAt: "2026-08-26T14:15:15Z"
   }
 };
 
-let appCounter = 2;
+let appCounter = 4;
 
 // Utility: Record Audit Event
 function addAuditRecord(department, request, purpose, result, applicationId = "N/A") {
@@ -461,6 +591,84 @@ function addDocumentToApplication(applicationId, docData) {
   return { success: true, document: newDoc, application: app };
 }
 
+/**
+ * Calculate dynamic aggregate statistics for Department Dashboard
+ */
+function getDashboardStats() {
+  const allApps = Object.values(applications);
+  const totalApplications = allApps.length;
+
+  const byStatus = {
+    completed: 0,
+    processing: 0,
+    queued: 0,
+    rejected: 0
+  };
+
+  const byService = {};
+  availableServices.forEach(srv => {
+    byService[srv.id] = {
+      id: srv.id,
+      name: srv.name,
+      department: srv.department,
+      count: 0
+    };
+  });
+
+  const verifications = {
+    identity: { verified: 0, queued: 0, pending: 0, failed: 0 },
+    address: { verified: 0, queued: 0, pending: 0, failed: 0 },
+    tax: { verified: 0, queued: 0, pending: 0, failed: 0 },
+    municipal: { verified: 0, queued: 0, pending: 0, failed: 0 }
+  };
+
+  allApps.forEach(app => {
+    const status = (app.status || 'processing').toLowerCase();
+    if (byStatus.hasOwnProperty(status)) {
+      byStatus[status]++;
+    } else {
+      byStatus.processing++;
+    }
+
+    if (app.serviceId && byService[app.serviceId]) {
+      byService[app.serviceId].count++;
+    } else if (app.service) {
+      const match = availableServices.find(s => s.name === app.service || s.id === app.serviceId);
+      if (match && byService[match.id]) {
+        byService[match.id].count++;
+      }
+    }
+
+    if (app.verifications) {
+      ['identity', 'address', 'tax', 'municipal'].forEach(key => {
+        const vState = (app.verifications[key] || 'pending').toLowerCase();
+        if (verifications[key] && verifications[key].hasOwnProperty(vState)) {
+          verifications[key][vState]++;
+        } else if (verifications[key]) {
+          verifications[key].pending++;
+        }
+      });
+    }
+  });
+
+  const recentApplications = [...allApps]
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, 5);
+
+  const recentAuditLogs = auditLogs.slice(0, 10);
+
+  return {
+    totalApplications,
+    byStatus,
+    byService: Object.values(byService),
+    verifications,
+    serviceStatuses,
+    totalAuditLogs: auditLogs.length,
+    recentApplications,
+    recentAuditLogs
+  };
+}
+
 module.exports = {
   serviceStatuses,
   availableServices,
@@ -474,5 +682,6 @@ module.exports = {
   createNewApplication,
   updateServiceStatus,
   addDocumentToApplication,
-  addAuditRecord
+  addAuditRecord,
+  getDashboardStats
 };

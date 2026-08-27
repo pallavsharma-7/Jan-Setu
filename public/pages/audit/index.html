@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log & Governance | Jan-Setu Interoperability Platform</title>
+  <meta name="description" content="Transparent, immutable audit log of cross-departmental verification requests, data accesses, and citizen consent records on Jan-Setu.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="audit.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Module: <strong>Audit & Governance (Rucha)</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <div class="gov-emblem">JS</div>
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div class="flex gap-1">
+        <span class="badge badge-online"><span class="status-indicator online"></span>AUDIT ENGINE ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link">Services</a>
+        <a href="/pages/application/" class="gov-nav-link">Apply</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
+        <a href="/pages/dashboard/" class="gov-nav-link">Department Dashboard</a>
+        <a href="/pages/audit/" class="gov-nav-link active" aria-current="page">Audit Log</a>
+        <a href="/pages/monitoring/" class="gov-nav-link">System Status</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer" role="alert">
+      <div>
+        <strong>AUDIT & GOVERNANCE RECORD:</strong> Transparent log of simulated inter-departmental verification queries. Demonstrating that data is accessed solely for citizen-consented, purpose-bound workflows.
+      </div>
+    </div>
+
+    <!-- Audit Hero Header -->
+    <section class="audit-hero" aria-labelledby="audit-title">
+      <div>
+        <h1 id="audit-title" class="audit-hero-title">Inter-Departmental Audit Log & Access Trail</h1>
+        <p class="audit-hero-subtitle">
+          Transparent, immutable record of all purpose-bound queries, verification results, and operational events coordinated across Identity, Revenue, Tax, and Municipal services.
+        </p>
+      </div>
+      <div class="audit-hero-actions">
+        <button id="btn-refresh-audit" class="btn btn-outline" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" onclick="AuditApp.refreshData()">
+          <span>&#x21bb;</span> Refresh Logs
+        </button>
+        <button class="btn btn-secondary" onclick="AuditApp.exportJSON()">
+          <span>&#x1F4BE;</span> Copy JSON
+        </button>
+        <a href="/pages/dashboard/" class="btn btn-primary">
+          <span>&larr;</span> Back to Dashboard
+        </a>
+      </div>
+    </section>
+
+    <!-- Global Error Banner (Hidden by default) -->
+    <div id="audit-error-banner" class="alert alert-danger" style="display: none;" role="alert">
+      <div class="flex-between">
+        <span id="audit-error-message">Failed to communicate with Jan-Setu Audit API.</span>
+        <button class="btn btn-sm btn-danger" onclick="AuditApp.init()">Retry</button>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <section aria-labelledby="audit-kpi-heading" style="margin-bottom: 1.5rem;">
+      <h2 id="audit-kpi-heading" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Audit Key Metrics</h2>
+      <div class="audit-stats-grid">
+        <div class="audit-stat-card">
+          <span class="audit-stat-title">Total Audit Events</span>
+          <div class="audit-stat-value" id="stat-total-events">--</div>
+          <span class="audit-stat-desc">Logged verification & status events</span>
+        </div>
+        <div class="audit-stat-card">
+          <span class="audit-stat-title">Verified Outcomes</span>
+          <div class="audit-stat-value" id="stat-verified-events" style="color: var(--color-success);">--</div>
+          <span class="audit-stat-desc">Cleared department validations</span>
+        </div>
+        <div class="audit-stat-card">
+          <span class="audit-stat-title">Queued / Offline</span>
+          <div class="audit-stat-value" id="stat-queued-events" style="color: var(--color-warning);">--</div>
+          <span class="audit-stat-desc">Graceful queue hold records</span>
+        </div>
+        <div class="audit-stat-card">
+          <span class="audit-stat-title">Purpose-Bound Access</span>
+          <div class="audit-stat-value" style="color: var(--color-teal);">100%</div>
+          <span class="audit-stat-desc">Explicit citizen consent verified</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Audit Registry Panel -->
+    <section class="gov-card" aria-labelledby="audit-registry-heading">
+      <div class="gov-card-header flex-between flex-wrap gap-1">
+        <div>
+          <h2 id="audit-registry-heading" class="gov-card-title">&#x1F5C4;&#xFE0F; Audit Event Stream</h2>
+          <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">Comprehensive verification event chronology and data access telemetry</p>
+        </div>
+        <div>
+          <span id="audit-count-badge" class="badge badge-pending">Loading...</span>
+        </div>
+      </div>
+
+      <div class="gov-card-body" style="padding-bottom: 0.5rem;">
+        
+        <!-- Filter and Search Toolbar -->
+        <div class="audit-toolbar">
+          <div class="audit-toolbar-grid">
+            
+            <!-- Search Query -->
+            <div>
+              <label for="audit-filter-search" class="filter-label">Search Audit Logs</label>
+              <input type="text" id="audit-filter-search" class="form-input" placeholder="Search by App ID, Action, Purpose..." oninput="AuditApp.applyFilters()">
+            </div>
+
+            <!-- Department Filter -->
+            <div>
+              <label for="audit-filter-dept" class="filter-label">Department / Source</label>
+              <select id="audit-filter-dept" class="form-select" onchange="AuditApp.applyFilters()">
+                <option value="all">All Departments</option>
+                <option value="Identity Service">Identity Service</option>
+                <option value="Revenue Service">Revenue Service</option>
+                <option value="Tax Service">Tax Service</option>
+                <option value="Municipal Service">Municipal Service</option>
+                <option value="Jan-Setu Gateway">Jan-Setu Gateway</option>
+                <option value="System Monitor">System Monitor</option>
+              </select>
+            </div>
+
+            <!-- Result Filter -->
+            <div>
+              <label for="audit-filter-result" class="filter-label">Outcome Status</label>
+              <select id="audit-filter-result" class="form-select" onchange="AuditApp.applyFilters()">
+                <option value="all">All Outcomes</option>
+                <option value="Verified">Verified</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Uploaded">Uploaded</option>
+                <option value="Queued">Queued</option>
+              </select>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+              <label for="audit-filter-sort" class="filter-label">Chronology</label>
+              <select id="audit-filter-sort" class="form-select" onchange="AuditApp.applyFilters()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
+
+            <!-- Clear Filters -->
+            <div>
+              <button class="btn btn-outline" style="width: 100%; white-space: nowrap;" onclick="AuditApp.resetFilters()">
+                Reset
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Audit Table -->
+        <div class="gov-table-container">
+          <table class="gov-table" id="audit-table" aria-label="Audit Events Ledger">
+            <thead>
+              <tr>
+                <th scope="col">Event ID</th>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Application ID</th>
+                <th scope="col">Department / Actor</th>
+                <th scope="col">Request & Purpose</th>
+                <th scope="col">Outcome Result</th>
+                <th scope="col" style="text-align: right;">Inspect</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem;">
+                  <div class="loading-spinner" style="margin-right: 0.5rem;"></div> Loading audit records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="audit-empty-state" class="empty-state-box" style="display: none;">
+          <div class="empty-state-icon">&#x1F50D;</div>
+          <div class="empty-state-title">No Audit Records Match Query</div>
+          <p class="empty-state-desc">No events matched your current search filters. Try adjusting your parameters or clear the filters.</p>
+          <button class="btn btn-secondary btn-sm" onclick="AuditApp.resetFilters()">Clear Filters</button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Detailed Event Record Modal (Hidden by default) -->
+  <div id="audit-modal" class="modal-backdrop" style="display: none;" onclick="AuditApp.closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-event-title">Audit Record Details</h3>
+        <button class="modal-close-btn" onclick="AuditApp.closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 1rem;">
+          <div class="flex-between" style="margin-bottom: 0.5rem;">
+            <span id="modal-event-id" class="audit-id-badge">AUD-XXXX</span>
+            <span id="modal-event-status"></span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--color-text-muted);" id="modal-event-time">--</div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <div class="form-label">Raw Structured JSON Record:</div>
+          <pre class="raw-json-viewer" id="modal-raw-json">{}</pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-sm" onclick="AuditApp.copyModalJSON()">Copy JSON</button>
+        <button class="btn btn-primary btn-sm" onclick="AuditApp.closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+          Demonstrating federated data exchange, automated verification workflows, and operator dashboard oversight.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+          <li><a href="/pages/dashboard/">Department Dashboard</a></li>
+          <li><a href="/pages/audit/">Audit Trail</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Simulated Services</h4>
+        <ul>
+          <li>Identity Service (Simulated)</li>
+          <li>Revenue Service (Simulated)</li>
+          <li>Tax Service (Simulated)</li>
+          <li>Municipal Service (Simulated)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Module: Department Dashboard & Audit (Rucha).
+    </div>
+  </footer>
+
+  <!-- JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="audit.js"></script>
+</body>
+</html>
