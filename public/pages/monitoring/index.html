@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status & Health Monitor | Jan-Setu Interoperability Platform</title>
+  <meta name="description" content="Real-time operational monitoring, departmental adapter health, pipeline bottlenecks, and resilience controls for the Jan-Setu unified governance platform.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="monitoring.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Module: <strong>System Health & Monitoring (Parth)</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <div class="gov-emblem">JS</div>
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div class="flex gap-1 align-center">
+        <span class="badge badge-online" id="header-system-status">
+          <span class="status-indicator online"></span>SYSTEM TELEMETRY ACTIVE
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link">Services</a>
+        <a href="/pages/application/" class="gov-nav-link">Apply</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
+        <a href="/pages/dashboard/" class="gov-nav-link">Department Dashboard</a>
+        <a href="/pages/audit/" class="gov-nav-link">Audit Log</a>
+        <a href="/pages/monitoring/" class="gov-nav-link active" aria-current="page">System Status</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer" role="alert">
+      <div>
+        <strong>OPERATIONAL HEALTH & TELEMETRY CONSOLE:</strong> Real-time visibility into federated departmental adapters, queue depths, response latencies, resilient fault tolerance, and live simulated service status toggles.
+      </div>
+    </div>
+
+    <!-- Monitoring Hero Header -->
+    <section class="monitoring-hero" aria-labelledby="monitoring-title">
+      <div class="monitoring-hero-content">
+        <div class="monitoring-hero-badge">
+          <span class="pulse-indicator"></span>
+          <span>Interoperability Telemetry & Gateway Monitor</span>
+        </div>
+        <h1 id="monitoring-title" class="monitoring-hero-title">System Status & Gateway Health</h1>
+        <p class="monitoring-hero-subtitle">
+          Continuous operational oversight of federated departmental adapters, asynchronous queue health, response latencies, and service circuit controls across Jan-Setu.
+        </p>
+      </div>
+
+      <div class="monitoring-hero-controls">
+        <div class="auto-refresh-group">
+          <label for="auto-refresh-select" class="auto-refresh-label">Auto Refresh:</label>
+          <select id="auto-refresh-select" class="form-input form-select-sm" onchange="MonitoringApp.handleAutoRefreshChange(this.value)">
+            <option value="5">Every 5s</option>
+            <option value="10" selected>Every 10s</option>
+            <option value="30">Every 30s</option>
+            <option value="0">Off (Manual)</option>
+          </select>
+        </div>
+
+        <button id="btn-refresh-monitoring" class="btn btn-outline btn-hero-action" onclick="MonitoringApp.refreshData()">
+          <span id="refresh-icon">&#x21bb;</span> Refresh
+        </button>
+
+        <button class="btn btn-secondary btn-hero-action" onclick="MonitoringApp.openDiagnosticsModal()">
+          <span>&#x1F4CB;</span> Diagnostics JSON
+        </button>
+
+        <a href="/pages/dashboard/" class="btn btn-outline btn-hero-action" style="color: #ffffff; border-color: rgba(255,255,255,0.4);">
+          <span>&#x1F4CA;</span> Dashboard
+        </a>
+      </div>
+    </section>
+
+    <!-- Global Error Banner (Hidden by default) -->
+    <div id="monitoring-error-banner" class="alert alert-danger" style="display: none;" role="alert">
+      <div class="flex-between align-center">
+        <span id="monitoring-error-message">Failed to communicate with Jan-Setu Monitoring API.</span>
+        <button class="btn btn-sm btn-danger" onclick="MonitoringApp.init()">Retry Connection</button>
+      </div>
+    </div>
+
+    <!-- Top KPI Telemetry Cards -->
+    <section aria-labelledby="kpi-heading" style="margin-bottom: 1.5rem;">
+      <h2 id="kpi-heading" class="sr-only">System Health Key Performance Indicators</h2>
+      <div class="telemetry-grid" id="monitoring-kpi-container">
+        
+        <!-- System Health Card -->
+        <div class="kpi-card" id="kpi-system-health-card">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Overall System Status</span>
+            <span class="kpi-card-icon" id="kpi-health-icon">&#x2705;</span>
+          </div>
+          <div class="kpi-card-value" id="kpi-health-status">OPERATIONAL</div>
+          <div class="kpi-card-footer">
+            <span class="badge badge-online" id="kpi-online-adapters-badge">4/4 Adapters Online</span>
+            <span id="kpi-health-subtext" style="font-size: 0.75rem; color: var(--color-text-light);">Gateway running</span>
+          </div>
+        </div>
+
+        <!-- Latency & Uptime Card -->
+        <div class="kpi-card">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Gateway Telemetry</span>
+            <span class="kpi-card-icon">&#x26A1;</span>
+          </div>
+          <div class="kpi-card-value" id="kpi-gateway-latency">~12 ms</div>
+          <div class="kpi-card-footer">
+            <span id="kpi-server-uptime" style="font-weight: 600; color: var(--color-teal);">Uptime: --</span>
+            <span id="kpi-memory-usage" style="font-size: 0.75rem; color: var(--color-text-light);">Heap: --</span>
+          </div>
+        </div>
+
+        <!-- Pipeline Throughput Card -->
+        <div class="kpi-card">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Verification Pipeline</span>
+            <span class="kpi-card-icon">&#x1F504;</span>
+          </div>
+          <div class="kpi-card-value" id="kpi-pipeline-throughput">--</div>
+          <div class="kpi-card-footer">
+            <span class="badge badge-online" id="kpi-completion-rate">0% Cleared</span>
+            <span id="kpi-processing-count" style="font-size: 0.75rem; color: var(--color-text-light);">0 In Flight</span>
+          </div>
+        </div>
+
+        <!-- Resilient Queue Depth Card -->
+        <div class="kpi-card" id="kpi-queue-card">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Resilient Queue Depth</span>
+            <span class="kpi-card-icon">&#x23F3;</span>
+          </div>
+          <div class="kpi-card-value" id="kpi-queue-depth">0</div>
+          <div class="kpi-card-footer">
+            <span class="badge badge-online" id="kpi-queue-badge">Queue Healthy</span>
+            <span id="kpi-queue-subtext" style="font-size: 0.75rem; color: var(--color-text-light);">0 Bottlenecked</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Department Interoperability Adapters Section -->
+    <section class="monitor-section" aria-labelledby="adapters-heading">
+      <div class="section-header-row">
+        <div>
+          <h2 id="adapters-heading" class="section-heading">
+            <span>🏛️</span> Department Interoperability Adapters
+          </h2>
+          <p class="section-subheading">
+            Live status of federated departmental verification adapters. Toggle status to simulate outages and observe Jan-Setu's resilient queuing in real time.
+          </p>
+        </div>
+        <div class="section-header-actions">
+          <button class="btn btn-outline btn-sm" onclick="MonitoringApp.probeAllAdapters()">
+            <span>&#x1F50D;</span> Probe All Adapters
+          </button>
+        </div>
+      </div>
+
+      <div class="adapter-cards-grid" id="adapters-container">
+        <!-- Dynamically rendered by monitoring.js -->
+        <div class="loading-placeholder">Loading department adapter telemetry...</div>
+      </div>
+    </section>
+
+    <!-- Resilient Architecture & Outage Simulation Section -->
+    <section class="monitor-section" aria-labelledby="resilience-heading">
+      <div class="section-header-row">
+        <div>
+          <h2 id="resilience-heading" class="section-heading">
+            <span>🛡️</span> Fault-Tolerance & Queue Resilience Simulation
+          </h2>
+          <p class="section-subheading">
+            Jan-Setu protects citizen workflows from downstream service outages by queuing requests gracefully rather than failing with 500 errors.
+          </p>
+        </div>
+      </div>
+
+      <div class="resilience-panel">
+        <div class="resilience-info">
+          <div class="resilience-step">
+            <div class="step-num">1</div>
+            <div>
+              <strong>Simulate Outage:</strong>
+              <p>Toggle any department (e.g. Tax Service) to OFFLINE. New or in-flight applications requesting that verification will transition safely into QUEUED state.</p>
+            </div>
+          </div>
+          <div class="resilience-step">
+            <div class="step-num">2</div>
+            <div>
+              <strong>Resilient Holding:</strong>
+              <p>Other available department checks continue to complete. Citizen is not asked to restart or re-submit documents.</p>
+            </div>
+          </div>
+          <div class="resilience-step">
+            <div class="step-num">3</div>
+            <div>
+              <strong>Auto-Recovery Drain:</strong>
+              <p>When the department returns ONLINE, Jan-Setu automatically resumes orchestration and drains the queue to completion.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="simulation-actions-card">
+          <div class="sim-card-title">Interactive Resilience Controls</div>
+          <p style="font-size: 0.82rem; color: var(--color-text-light); margin-bottom: 1rem;">
+            Test Jan-Setu's self-healing orchestration capabilities with these instant scenarios:
+          </p>
+          <div class="sim-buttons-stack">
+            <button class="btn btn-warning btn-sm btn-sim" onclick="MonitoringApp.simulateTaxOutage()">
+              <span>⚠️</span> Simulate Tax Service Outage
+            </button>
+            <button class="btn btn-secondary btn-sm btn-sim" onclick="MonitoringApp.restoreAllServices()">
+              <span>✅</span> Restore All Services Online
+            </button>
+            <button class="btn btn-primary btn-sm btn-sim" onclick="MonitoringApp.triggerReorchestration()">
+              <span>⚡</span> Force Pipeline Re-Sync (Drain Queue)
+            </button>
+          </div>
+          <div id="sim-status-message" class="sim-status-msg" style="display: none;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orchestration Pipeline & Queue Inspector Section -->
+    <section class="monitor-section" aria-labelledby="queue-inspector-heading">
+      <div class="section-header-row">
+        <div>
+          <h2 id="queue-inspector-heading" class="section-heading">
+            <span>🔄</span> Orchestration Pipeline & Bottleneck Inspector
+          </h2>
+          <p class="section-subheading">
+            Live inspection of applications undergoing verification, highlighting bottlenecked departments and verification state matrices.
+          </p>
+        </div>
+        <div class="filter-pills-group">
+          <button class="filter-pill active" onclick="MonitoringApp.setPipelineFilter('all', this)">All Pipeline</button>
+          <button class="filter-pill" onclick="MonitoringApp.setPipelineFilter('queued', this)">Queued Only</button>
+          <button class="filter-pill" onclick="MonitoringApp.setPipelineFilter('processing', this)">In Processing</button>
+          <button class="filter-pill" onclick="MonitoringApp.setPipelineFilter('completed', this)">Completed</button>
+        </div>
+      </div>
+
+      <div class="table-responsive card-table-container">
+        <table class="gov-table" id="pipeline-table">
+          <thead>
+            <tr>
+              <th>Application ID</th>
+              <th>Applicant</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Bottleneck Dept</th>
+              <th>Verification Matrix</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pipeline-table-body">
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 2rem; color: var(--color-text-light);">
+                Loading pipeline applications...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- API Endpoints Telemetry & Health Section -->
+    <section class="monitor-section" aria-labelledby="endpoints-heading">
+      <div class="section-header-row">
+        <div>
+          <h2 id="endpoints-heading" class="section-heading">
+            <span>📡</span> Gateway API Endpoint Telemetry
+          </h2>
+          <p class="section-subheading">
+            Operational status and response latency matrix for Jan-Setu's core REST APIs and verification adapters.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-responsive card-table-container">
+        <table class="gov-table" id="endpoints-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint Route</th>
+              <th>Target Subsystem</th>
+              <th>Avg Latency</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="endpoints-table-body">
+            <!-- Dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Real-time Telemetry Event Stream Section -->
+    <section class="monitor-section" aria-labelledby="events-heading">
+      <div class="section-header-row">
+        <div>
+          <h2 id="events-heading" class="section-heading">
+            <span>📋</span> Real-time System Telemetry & Event Stream
+          </h2>
+          <p class="section-subheading">
+            Live chronological stream of gateway orchestration events, service status transitions, health probes, and queue operations.
+          </p>
+        </div>
+        <div class="flex gap-05 align-center">
+          <label for="event-severity-filter" class="sr-only">Filter Severity</label>
+          <select id="event-severity-filter" class="form-input form-select-sm" onchange="MonitoringApp.handleEventFilterChange(this.value)">
+            <option value="all">All Events</option>
+            <option value="error">Errors & Outages</option>
+            <option value="warning">Queued & Warnings</option>
+            <option value="success">Success & Recoveries</option>
+            <option value="info">Info</option>
+          </select>
+          <a href="/pages/audit/" class="btn btn-outline btn-sm">Full Audit Trail &rarr;</a>
+        </div>
+      </div>
+
+      <div class="event-stream-container" id="events-stream-list">
+        <!-- Dynamically rendered -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Diagnostics JSON Modal -->
+  <div id="diagnostics-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="flex align-center gap-05">
+          <span style="font-size: 1.25rem;">🔍</span>
+          <h3 id="modal-title" style="margin: 0; font-size: 1.15rem;">System Diagnostics & Health Telemetry Payload</h3>
+        </div>
+        <button class="modal-close-btn" onclick="MonitoringApp.closeDiagnosticsModal()" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">
+          Raw JSON payload generated by <code>GET /api/monitoring</code> including Node runtime, adapter latencies, and pipeline states:
+        </p>
+        <pre class="json-code-block" id="diagnostics-json-content">Loading diagnostics...</pre>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-copy-diagnostics" class="btn btn-secondary btn-sm" onclick="MonitoringApp.copyDiagnosticsJSON()">
+          <span>📋</span> Copy to Clipboard
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="MonitoringApp.closeDiagnosticsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adapter Probe Result Modal -->
+  <div id="probe-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="probe-modal-title">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <div class="flex align-center gap-05">
+          <span style="font-size: 1.25rem;">⚡</span>
+          <h3 id="probe-modal-title" style="margin: 0; font-size: 1.15rem;">Diagnostic Probe Result</h3>
+        </div>
+        <button class="modal-close-btn" onclick="MonitoringApp.closeProbeModal()" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="probe-modal-body">
+        <!-- Content inserted dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" onclick="MonitoringApp.closeProbeModal()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+          Demonstrating federated data exchange, resilient fault tolerance, and automated verification workflows.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+          <li><a href="/pages/dashboard/">Department Dashboard</a></li>
+          <li><a href="/pages/audit/">Audit Log</a></li>
+          <li><a href="/pages/monitoring/">System Status</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Simulated Services</h4>
+        <ul>
+          <li>Identity Service (Adapter)</li>
+          <li>Revenue Service (Adapter)</li>
+          <li>Tax Service (Adapter)</li>
+          <li>Municipal Service (Adapter)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Built on core foundation branch <strong>pallav-core</strong>. Module: Monitoring & System Health (Parth).
+    </div>
+  </footer>
+
+  <!-- Core JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="monitoring.js"></script>
+</body>
+</html>
