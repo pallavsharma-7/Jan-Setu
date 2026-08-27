@@ -669,6 +669,314 @@ function getDashboardStats() {
   };
 }
 
+/**
+ * PARTH - Monitoring Module
+ * Aggregates live system telemetry, adapter health, pipeline bottlenecks, and operational stats
+ */
+function getMonitoringData() {
+  const allApps = Object.values(applications);
+  const totalApplications = allApps.length;
+
+  // 1. Adapter Statuses & Health Metrics
+  const departmentConfigs = [
+    {
+      id: "identity",
+      name: "Identity Service",
+      department: "Unique Identification & Civil Registration",
+      endpoint: "/api/verify/identity",
+      baseLatency: 42
+    },
+    {
+      id: "revenue",
+      name: "Revenue Service",
+      department: "Land Records & Residence Administration",
+      endpoint: "/api/verify/address",
+      baseLatency: 58
+    },
+    {
+      id: "tax",
+      name: "Tax Service",
+      department: "Commercial & Property Tax Directorate",
+      endpoint: "/api/verify/tax",
+      baseLatency: 76
+    },
+    {
+      id: "municipal",
+      name: "Municipal Service",
+      department: "Urban Development & Trade Licensing",
+      endpoint: "/api/verify/municipal",
+      baseLatency: 51
+    }
+  ];
+
+  let onlineCount = 0;
+  const adapters = departmentConfigs.map(dept => {
+    const status = serviceStatuses[dept.id] || "offline";
+    const isOnline = status === "online";
+    if (isOnline) onlineCount++;
+
+    let verifiedCount = 0;
+    let queuedCount = 0;
+    let pendingCount = 0;
+
+    allApps.forEach(app => {
+      const v = app.verifications ? (app.verifications[dept.id] || 'pending') : 'pending';
+      if (v === 'verified') verifiedCount++;
+      else if (v === 'queued') queuedCount++;
+      else pendingCount++;
+    });
+
+    const simulatedLatencyMs = isOnline ? dept.baseLatency + Math.floor(Math.random() * 8) : 0;
+    const uptimePct = isOnline ? 99.8 : 84.5;
+
+    return {
+      id: dept.id,
+      name: dept.name,
+      department: dept.department,
+      endpoint: dept.endpoint,
+      status,
+      isOnline,
+      latencyMs: simulatedLatencyMs,
+      verifiedCount,
+      queuedCount,
+      pendingCount,
+      uptimePct
+    };
+  });
+
+  // Overall Gateway Health Status
+  let overallHealth = "operational";
+  let healthLabel = "All Department Adapters Operational";
+  if (onlineCount === 0) {
+    overallHealth = "critical";
+    healthLabel = "Critical: All Department Adapters Offline";
+  } else if (onlineCount < 4) {
+    overallHealth = "degraded";
+    healthLabel = `Degraded: ${4 - onlineCount} Department Adapter(s) Offline`;
+  }
+
+  // 2. Queue & Pipeline Bottleneck Analysis
+  const queuedApplications = [];
+  const processingApplications = [];
+  let completedCount = 0;
+  let queuedCount = 0;
+  let processingCount = 0;
+  let rejectedCount = 0;
+
+  const bottleneckCounts = {
+    identity: 0,
+    revenue: 0,
+    tax: 0,
+    municipal: 0
+  };
+
+  allApps.forEach(app => {
+    const status = (app.status || 'processing').toLowerCase();
+    if (status === 'completed') {
+      completedCount++;
+    } else if (status === 'queued') {
+      queuedCount++;
+      // Determine which department caused the queue
+      const blockingDepts = [];
+      ['identity', 'revenue', 'tax', 'municipal'].forEach(d => {
+        if (app.verifications && app.verifications[d] === 'queued') {
+          blockingDepts.push(d);
+          bottleneckCounts[d]++;
+        }
+      });
+
+      queuedApplications.push({
+        id: app.id,
+        service: app.service,
+        applicantName: app.applicant ? app.applicant.name : 'Unknown',
+        status: app.status,
+        blockingDepartments: blockingDepts.length ? blockingDepts : ['service-sync'],
+        verifications: app.verifications || {},
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt
+      });
+    } else if (status === 'processing') {
+      processingCount++;
+      processingApplications.push({
+        id: app.id,
+        service: app.service,
+        applicantName: app.applicant ? app.applicant.name : 'Unknown',
+        status: app.status,
+        verifications: app.verifications || {},
+        createdAt: app.createdAt
+      });
+    } else if (status === 'rejected') {
+      rejectedCount++;
+    }
+  });
+
+  // 3. Document Tracking Telemetry
+  let totalDocuments = 0;
+  let verifiedDocuments = 0;
+  let pendingDocuments = 0;
+  let uploadedDocuments = 0;
+
+  allApps.forEach(app => {
+    if (Array.isArray(app.documents)) {
+      app.documents.forEach(doc => {
+        totalDocuments++;
+        if (doc.verificationState === 'verified') verifiedDocuments++;
+        else pendingDocuments++;
+        if (doc.uploadState === 'uploaded') uploadedDocuments++;
+      });
+    }
+  });
+
+  // 4. API Endpoints Health Matrix
+  const apiEndpoints = [
+    { method: "GET", path: "/api/health", target: "Core Gateway", status: "HEALTHY", avgLatency: "4ms" },
+    { method: "GET", path: "/api/services", target: "Service Catalog", status: "HEALTHY", avgLatency: "6ms" },
+    { method: "GET", path: "/api/services/status", target: "Department Registry", status: "HEALTHY", avgLatency: "5ms" },
+    { method: "POST", path: "/api/applications", target: "Orchestration Gateway", status: overallHealth === "critical" ? "DEGRADED" : "HEALTHY", avgLatency: "28ms" },
+    { method: "GET", path: "/api/applications", target: "Application Store", status: "HEALTHY", avgLatency: "10ms" },
+    { method: "GET", path: "/api/dashboard/stats", target: "Analytics Engine", status: "HEALTHY", avgLatency: "12ms" },
+    { method: "GET", path: "/api/audit", target: "Immutable Audit Store", status: "HEALTHY", avgLatency: "8ms" },
+    { method: "POST", path: "/api/verify/identity", target: "Identity Adapter", status: serviceStatuses.identity === "online" ? "HEALTHY" : "OFFLINE", avgLatency: serviceStatuses.identity === "online" ? "42ms" : "N/A" },
+    { method: "POST", path: "/api/verify/address", target: "Revenue Adapter", status: serviceStatuses.revenue === "online" ? "HEALTHY" : "OFFLINE", avgLatency: serviceStatuses.revenue === "online" ? "58ms" : "N/A" },
+    { method: "POST", path: "/api/verify/tax", target: "Tax Adapter", status: serviceStatuses.tax === "online" ? "HEALTHY" : "OFFLINE", avgLatency: serviceStatuses.tax === "online" ? "76ms" : "N/A" },
+    { method: "POST", path: "/api/verify/municipal", target: "Municipal Adapter", status: serviceStatuses.municipal === "online" ? "HEALTHY" : "OFFLINE", avgLatency: serviceStatuses.municipal === "online" ? "51ms" : "N/A" }
+  ];
+
+  // 5. System Runtime Metrics
+  const mem = process.memoryUsage();
+  const runtime = {
+    nodeVersion: process.version,
+    uptimeSeconds: Math.floor(process.uptime()),
+    heapUsedMB: Math.round((mem.heapUsed / 1024 / 1024) * 100) / 100,
+    heapTotalMB: Math.round((mem.heapTotal / 1024 / 1024) * 100) / 100,
+    platform: process.platform,
+    serverTimestamp: new Date().toISOString(),
+    module: "Monitoring (Parth)",
+    foundationBranch: "pallav-core"
+  };
+
+  // 6. Recent Monitoring / Telemetry Audit Stream
+  const recentEvents = auditLogs.slice(0, 12).map(log => {
+    let severity = "info";
+    const res = (log.result || '').toLowerCase();
+    const dept = (log.department || '').toLowerCase();
+    if (res.includes("offline") || res.includes("error") || res.includes("failed")) {
+      severity = "error";
+    } else if (res.includes("queued") || res.includes("pending")) {
+      severity = "warning";
+    } else if (res.includes("verified") || res.includes("clear") || res.includes("accepted") || res.includes("online")) {
+      severity = "success";
+    }
+
+    return {
+      ...log,
+      severity
+    };
+  });
+
+  return {
+    overallHealth,
+    healthLabel,
+    onlineAdaptersCount: onlineCount,
+    totalAdaptersCount: 4,
+    adapters,
+    pipeline: {
+      totalApplications,
+      completedCount,
+      processingCount,
+      queuedCount,
+      rejectedCount,
+      completionRate: totalApplications > 0 ? Math.round((completedCount / totalApplications) * 100) : 0,
+      bottleneckCounts,
+      queuedApplications,
+      processingApplications
+    },
+    documents: {
+      totalDocuments,
+      verifiedDocuments,
+      pendingDocuments,
+      uploadedDocuments
+    },
+    apiEndpoints,
+    runtime,
+    recentEvents
+  };
+}
+
+/**
+ * Re-run orchestration for all queued applications
+ * Used when services recover from simulated offline state
+ */
+function reorchestrateAllQueued() {
+  const queuedAppIds = Object.keys(applications).filter(id => {
+    const app = applications[id];
+    return app.status === "queued" || 
+      (app.verifications && Object.values(app.verifications).some(v => v === "queued" || v === "pending"));
+  });
+
+  let processedCount = 0;
+  queuedAppIds.forEach(id => {
+    orchestrateApplication(id);
+    processedCount++;
+  });
+
+  addAuditRecord(
+    "System Monitor",
+    "Orchestration Pipeline Re-sync",
+    "Resilient Queue Drain",
+    `Re-processed ${processedCount} queued request(s)`,
+    queuedAppIds.length > 0 ? queuedAppIds[0] : "N/A"
+  );
+
+  return {
+    success: true,
+    processedCount,
+    queuedRemaining: Object.values(applications).filter(a => a.status === "queued").length,
+    applications: Object.values(applications)
+  };
+}
+
+/**
+ * Diagnostic health probe for an individual department service adapter
+ */
+function probeDepartmentService(department) {
+  const validDepts = ["identity", "revenue", "tax", "municipal"];
+  if (!validDepts.includes(department)) {
+    return { success: false, error: "Invalid department identifier" };
+  }
+
+  const status = serviceStatuses[department] || "offline";
+  const isOnline = status === "online";
+  const start = Date.now();
+  const latencyMs = isOnline ? Math.floor(Math.random() * 25) + 30 : 0;
+
+  addAuditRecord(
+    "System Monitor",
+    `Health Probe: ${department}`,
+    "Diagnostic Adapter Probe",
+    isOnline ? `Healthy (${latencyMs}ms)` : "Offline (503 Service Unavailable)"
+  );
+
+  return {
+    success: true,
+    department,
+    status,
+    isOnline,
+    latencyMs,
+    timestamp: new Date().toISOString(),
+    sampleResponse: isOnline ? {
+      probeStatus: "OK",
+      adapter: `${department.toUpperCase()}_ADAPTER`,
+      version: "1.0.0-mock",
+      ready: true
+    } : {
+      probeStatus: "SERVICE_OFFLINE",
+      adapter: `${department.toUpperCase()}_ADAPTER`,
+      ready: false
+    }
+  };
+}
+
 module.exports = {
   serviceStatuses,
   availableServices,
@@ -683,5 +991,8 @@ module.exports = {
   updateServiceStatus,
   addDocumentToApplication,
   addAuditRecord,
-  getDashboardStats
+  getDashboardStats,
+  getMonitoringData,
+  reorchestrateAllQueued,
+  probeDepartmentService
 };

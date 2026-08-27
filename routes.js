@@ -180,4 +180,39 @@ router.get('/audit', (req, res) => {
   res.json(logs);
 });
 
+// 11. GET /api/monitoring - Retrieve real-time system monitoring & adapter telemetry
+router.get('/monitoring', (req, res) => {
+  try {
+    const monitoringData = data.getMonitoringData();
+    res.json(monitoringData);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch monitoring metrics", message: err.message });
+  }
+});
+
+// 12. POST /api/monitoring/reorchestrate - Trigger pipeline re-sync across queued requests
+router.post('/monitoring/reorchestrate', (req, res) => {
+  try {
+    const result = data.reorchestrateAllQueued();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to re-orchestrate queued requests", message: err.message });
+  }
+});
+
+// 13. POST /api/monitoring/probe/:department - Trigger live diagnostic health probe
+router.post('/monitoring/probe/:department', (req, res) => {
+  try {
+    const { department } = req.params;
+    const probeResult = data.probeDepartmentService(department);
+    if (!probeResult.success) {
+      return res.status(400).json(probeResult);
+    }
+    res.json(probeResult);
+  } catch (err) {
+    res.status(500).json({ error: "Diagnostic probe failed", message: err.message });
+  }
+});
+
 module.exports = router;
+

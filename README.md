@@ -89,6 +89,9 @@ All endpoints are local REST endpoints provided by our Express backend:
 | `/api/verify/tax` | `POST` | Trigger simulated Tax Service check |
 | `/api/verify/municipal` | `POST` | Trigger simulated Municipal Service check |
 | `/api/audit` | `GET` | Access transparent audit trail of departmental data accesses with search/filter |
+| `/api/monitoring` | `GET` | Retrieve real-time system monitoring metrics & adapter telemetry |
+| `/api/monitoring/reorchestrate` | `POST` | Trigger pipeline re-sync across queued requests |
+| `/api/monitoring/probe/:department` | `POST` | Trigger live diagnostic health probe on a department adapter |
 
 ---
 
@@ -124,7 +127,7 @@ All endpoints are local REST endpoints provided by our Express backend:
 | **TANISHKA** | Application Submission Form & Workflow | `tanishka-application` | COMPLETED |
 | **PALAK** | Document Upload & Application Tracking UI | `palak-documents-tracking` | COMPLETED |
 | **RUCHA** | Department Officer Dashboard & Audit Log Viewer | `rucha-dashboard-audit` | COMPLETED |
-| **PARTH** | Interoperability Health Monitoring & Service Toggles | `parth-monitoring` | NEXT |
+| **PARTH** | Interoperability Health Monitoring & Service Toggles | `parth-monitoring` | COMPLETED |
 
 ---
 

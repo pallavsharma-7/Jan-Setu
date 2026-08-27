@@ -244,8 +244,87 @@ const JanSetuAPI = {
         recentAuditLogs: []
       };
     }
+  },
+
+  /**
+   * 14. Retrieve System Telemetry & Interoperability Monitoring Metrics
+   */
+  async getMonitoringData() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/monitoring`);
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (getMonitoringData):', err);
+      return {
+        overallHealth: 'critical',
+        healthLabel: 'Failed to communicate with Monitoring Service',
+        onlineAdaptersCount: 0,
+        totalAdaptersCount: 4,
+        adapters: [],
+        pipeline: {
+          totalApplications: 0,
+          completedCount: 0,
+          processingCount: 0,
+          queuedCount: 0,
+          rejectedCount: 0,
+          completionRate: 0,
+          bottleneckCounts: { identity: 0, revenue: 0, tax: 0, municipal: 0 },
+          queuedApplications: [],
+          processingApplications: []
+        },
+        documents: {
+          totalDocuments: 0,
+          verifiedDocuments: 0,
+          pendingDocuments: 0,
+          uploadedDocuments: 0
+        },
+        apiEndpoints: [],
+        runtime: {
+          nodeVersion: 'N/A',
+          uptimeSeconds: 0,
+          heapUsedMB: 0,
+          heapTotalMB: 0,
+          platform: 'N/A',
+          serverTimestamp: new Date().toISOString()
+        },
+        recentEvents: []
+      };
+    }
+  },
+
+  /**
+   * 15. Trigger Pipeline Re-sync across Queued Requests
+   */
+  async reorchestrateQueued() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/monitoring/reorchestrate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (reorchestrateQueued):', err);
+      return { success: false, error: err.message };
+    }
+  },
+
+  /**
+   * 16. Trigger Live Diagnostic Health Probe on Department Adapter
+   */
+  async probeDepartment(department) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/monitoring/probe/${department}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (probeDepartment):', err);
+      return { success: false, error: err.message };
+    }
   }
 };
 
 // Export to window for global browser scope access
 window.JanSetuAPI = JanSetuAPI;
+
