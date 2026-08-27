@@ -149,15 +149,15 @@ const MonitoringApp = (function () {
       if (t.overallHealth === 'operational') {
         healthStatusEl.textContent = 'OPERATIONAL';
         healthStatusEl.style.color = 'var(--color-success)';
-        if (healthIconEl) healthIconEl.textContent = '✅';
+        if (healthIconEl) healthIconEl.textContent = '';
       } else if (t.overallHealth === 'degraded') {
         healthStatusEl.textContent = 'DEGRADED';
         healthStatusEl.style.color = 'var(--color-warning)';
-        if (healthIconEl) healthIconEl.textContent = '⚠️';
+        if (healthIconEl) healthIconEl.textContent = '';
       } else {
         healthStatusEl.textContent = 'OUTAGE';
         healthStatusEl.style.color = 'var(--color-danger)';
-        if (healthIconEl) healthIconEl.textContent = '🛑';
+        if (healthIconEl) healthIconEl.textContent = '';
       }
 
       if (onlineBadgeEl) {
@@ -293,13 +293,12 @@ const MonitoringApp = (function () {
 
           <div class="adapter-footer-actions">
             <button class="btn btn-outline btn-sm" onclick="MonitoringApp.probeDepartment('${adapter.id}')">
-              <span>⚡</span> Probe Adapter
+              Probe Adapter
             </button>
             <button 
               class="btn-toggle-service ${isOnline ? 'is-online' : 'is-offline'}" 
               onclick="MonitoringApp.toggleAdapterStatus('${adapter.id}', '${adapter.status}')"
             >
-              <span>${isOnline ? '⏸️' : '▶️'}</span>
               <span>${isOnline ? 'Simulate Outage (Set Offline)' : 'Bring Online (Drain Queue)'}</span>
             </button>
           </div>
@@ -608,12 +607,12 @@ const MonitoringApp = (function () {
     const ok = await JanSetuUI.copyToClipboard(content.textContent);
     if (btn) {
       if (ok) {
-        btn.innerHTML = '<span>✅</span> Copied!';
+        btn.innerHTML = 'Copied!';
         setTimeout(() => {
-          btn.innerHTML = '<span>📋</span> Copy to Clipboard';
+          btn.innerHTML = 'Copy to Clipboard';
         }, 2000);
       } else {
-        btn.innerHTML = '<span>❌</span> Copy failed';
+        btn.innerHTML = 'Copy failed';
       }
     }
   }

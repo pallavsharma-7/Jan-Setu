@@ -21,7 +21,7 @@
 
     <div class="gov-brand-container">
       <div class="gov-brand">
-        <div class="gov-emblem">JS</div>
+        <img src="/assets/jan-setu-logo.jpg" alt="Jan-Setu Logo" class="gov-emblem-img">
         <div class="gov-title-group">
           <h1>JAN-SETU</h1>
           <div class="gov-subtitle">Unified Service Orchestration Platform</div>
@@ -83,15 +83,15 @@
         </div>
 
         <button id="btn-refresh-monitoring" class="btn btn-outline btn-hero-action" onclick="MonitoringApp.refreshData()">
-          <span id="refresh-icon">&#x21bb;</span> Refresh
+          Refresh
         </button>
 
         <button class="btn btn-secondary btn-hero-action" onclick="MonitoringApp.openDiagnosticsModal()">
-          <span>&#x1F4CB;</span> Diagnostics JSON
+          Diagnostics JSON
         </button>
 
         <a href="/pages/dashboard/" class="btn btn-outline btn-hero-action" style="color: #ffffff; border-color: rgba(255,255,255,0.4);">
-          <span>&#x1F4CA;</span> Dashboard
+          Dashboard
         </a>
       </div>
     </section>
@@ -113,7 +113,7 @@
         <div class="kpi-card" id="kpi-system-health-card">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Overall System Status</span>
-            <span class="kpi-card-icon" id="kpi-health-icon">&#x2705;</span>
+            <span class="kpi-card-icon" id="kpi-health-icon"></span>
           </div>
           <div class="kpi-card-value" id="kpi-health-status">OPERATIONAL</div>
           <div class="kpi-card-footer">
@@ -126,7 +126,7 @@
         <div class="kpi-card">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Gateway Telemetry</span>
-            <span class="kpi-card-icon">&#x26A1;</span>
+            <span class="kpi-card-icon"></span>
           </div>
           <div class="kpi-card-value" id="kpi-gateway-latency">~12 ms</div>
           <div class="kpi-card-footer">
@@ -139,7 +139,7 @@
         <div class="kpi-card">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Verification Pipeline</span>
-            <span class="kpi-card-icon">&#x1F504;</span>
+            <span class="kpi-card-icon"></span>
           </div>
           <div class="kpi-card-value" id="kpi-pipeline-throughput">--</div>
           <div class="kpi-card-footer">
@@ -152,7 +152,7 @@
         <div class="kpi-card" id="kpi-queue-card">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Resilient Queue Depth</span>
-            <span class="kpi-card-icon">&#x23F3;</span>
+            <span class="kpi-card-icon"></span>
           </div>
           <div class="kpi-card-value" id="kpi-queue-depth">0</div>
           <div class="kpi-card-footer">
@@ -169,7 +169,7 @@
       <div class="section-header-row">
         <div>
           <h2 id="adapters-heading" class="section-heading">
-            <span>🏛️</span> Department Interoperability Adapters
+            Department Interoperability Adapters
           </h2>
           <p class="section-subheading">
             Live status of federated departmental verification adapters. Toggle status to simulate outages and observe Jan-Setu's resilient queuing in real time.
@@ -177,7 +177,7 @@
         </div>
         <div class="section-header-actions">
           <button class="btn btn-outline btn-sm" onclick="MonitoringApp.probeAllAdapters()">
-            <span>&#x1F50D;</span> Probe All Adapters
+            Probe All Adapters
           </button>
         </div>
       </div>
@@ -193,7 +193,7 @@
       <div class="section-header-row">
         <div>
           <h2 id="resilience-heading" class="section-heading">
-            <span>🛡️</span> Fault-Tolerance & Queue Resilience Simulation
+            Fault-Tolerance & Queue Resilience Simulation
           </h2>
           <p class="section-subheading">
             Jan-Setu protects citizen workflows from downstream service outages by queuing requests gracefully rather than failing with 500 errors.
@@ -233,13 +233,13 @@
           </p>
           <div class="sim-buttons-stack">
             <button class="btn btn-warning btn-sm btn-sim" onclick="MonitoringApp.simulateTaxOutage()">
-              <span>⚠️</span> Simulate Tax Service Outage
+              Simulate Tax Service Outage
             </button>
             <button class="btn btn-secondary btn-sm btn-sim" onclick="MonitoringApp.restoreAllServices()">
-              <span>✅</span> Restore All Services Online
+              Restore All Services Online
             </button>
             <button class="btn btn-primary btn-sm btn-sim" onclick="MonitoringApp.triggerReorchestration()">
-              <span>⚡</span> Force Pipeline Re-Sync (Drain Queue)
+              Force Pipeline Re-Sync (Drain Queue)
             </button>
           </div>
           <div id="sim-status-message" class="sim-status-msg" style="display: none;"></div>
@@ -252,7 +252,7 @@
       <div class="section-header-row">
         <div>
           <h2 id="queue-inspector-heading" class="section-heading">
-            <span>🔄</span> Orchestration Pipeline & Bottleneck Inspector
+            Orchestration Pipeline & Bottleneck Inspector
           </h2>
           <p class="section-subheading">
             Live inspection of applications undergoing verification, highlighting bottlenecked departments and verification state matrices.
@@ -295,7 +295,7 @@
       <div class="section-header-row">
         <div>
           <h2 id="endpoints-heading" class="section-heading">
-            <span>📡</span> Gateway API Endpoint Telemetry
+            Gateway API Endpoint Telemetry
           </h2>
           <p class="section-subheading">
             Operational status and response latency matrix for Jan-Setu's core REST APIs and verification adapters.
@@ -326,7 +326,7 @@
       <div class="section-header-row">
         <div>
           <h2 id="events-heading" class="section-heading">
-            <span>📋</span> Real-time System Telemetry & Event Stream
+            Real-time System Telemetry & Event Stream
           </h2>
           <p class="section-subheading">
             Live chronological stream of gateway orchestration events, service status transitions, health probes, and queue operations.
@@ -357,7 +357,6 @@
     <div class="modal-card">
       <div class="modal-header">
         <div class="flex align-center gap-05">
-          <span style="font-size: 1.25rem;">🔍</span>
           <h3 id="modal-title" style="margin: 0; font-size: 1.15rem;">System Diagnostics & Health Telemetry Payload</h3>
         </div>
         <button class="modal-close-btn" onclick="MonitoringApp.closeDiagnosticsModal()" aria-label="Close modal">&times;</button>
@@ -370,7 +369,7 @@
       </div>
       <div class="modal-footer">
         <button id="btn-copy-diagnostics" class="btn btn-secondary btn-sm" onclick="MonitoringApp.copyDiagnosticsJSON()">
-          <span>📋</span> Copy to Clipboard
+          Copy to Clipboard
         </button>
         <button class="btn btn-outline btn-sm" onclick="MonitoringApp.closeDiagnosticsModal()">Close</button>
       </div>
@@ -382,7 +381,6 @@
     <div class="modal-card modal-sm">
       <div class="modal-header">
         <div class="flex align-center gap-05">
-          <span style="font-size: 1.25rem;">⚡</span>
           <h3 id="probe-modal-title" style="margin: 0; font-size: 1.15rem;">Diagnostic Probe Result</h3>
         </div>
         <button class="modal-close-btn" onclick="MonitoringApp.closeProbeModal()" aria-label="Close modal">&times;</button>

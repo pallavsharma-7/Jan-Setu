@@ -179,6 +179,16 @@ a:hover {
   border: 2px solid var(--color-saffron);
 }
 
+.gov-emblem-img {
+  height: 48px;
+  width: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--color-saffron);
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
 .gov-title-group h1 {
   font-size: 1.6rem;
   margin: 0;

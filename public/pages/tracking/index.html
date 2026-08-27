@@ -21,7 +21,7 @@
 
     <div class="gov-brand-container">
       <div class="gov-brand">
-        <div class="gov-emblem">JS</div>
+        <img src="/assets/jan-setu-logo.jpg" alt="Jan-Setu Logo" class="gov-emblem-img">
         <div class="gov-title-group">
           <h1>JAN-SETU</h1>
           <div class="gov-subtitle">Unified Service Orchestration Platform</div>
@@ -99,7 +99,7 @@
 
       <!-- 2. EMPTY / NO ID STATE -->
       <div id="view-empty" class="tracker-empty-state" style="display: none;">
-        <div class="tracker-empty-icon">&#128269;</div>
+        <div class="tracker-empty-icon"></div>
         <h3 class="tracker-empty-title">No Application Selected</h3>
         <p class="tracker-empty-desc">
           Please enter your Jan-Setu Application ID in the search box above (e.g. <strong>JS-2026-001</strong>), or submit a new service request through the Application Flow.
@@ -112,7 +112,7 @@
 
       <!-- 3. NOT FOUND / ERROR STATE -->
       <div id="view-error" class="tracker-empty-state" style="display: none;" role="alert">
-        <div class="tracker-empty-icon" style="color: var(--color-danger);">&#9888;</div>
+        <div class="tracker-empty-icon" style="color: var(--color-danger);"></div>
         <h3 class="tracker-empty-title" id="error-title">Application Not Found</h3>
         <p class="tracker-empty-desc" id="error-message">
           We could not find an application with the specified ID. Please verify the number and try again.
@@ -156,7 +156,7 @@
                 &#8635; Refresh Status
               </button>
               <button type="button" class="btn btn-outline btn-sm" onclick="printTrackingSummary()" title="Print citizen receipt">
-                &#128438; Print Summary
+                Print Summary
               </button>
             </div>
           </div>
@@ -168,7 +168,7 @@
           <!-- Left Card: Applicant & Service Profile -->
           <div class="gov-card">
             <div class="gov-card-header">
-              <h3 class="gov-card-title">&#128100; Applicant &amp; Service Profile</h3>
+              <h3 class="gov-card-title">Applicant &amp; Service Profile</h3>
               <span class="badge badge-online">CITIZEN RECORD</span>
             </div>
             <div class="gov-card-body">
@@ -204,7 +204,7 @@
           <!-- Right Card: Department Verification Status (4 Services) -->
           <div class="gov-card">
             <div class="gov-card-header">
-              <h3 class="gov-card-title">&#127963; Department Verification Clearance</h3>
+              <h3 class="gov-card-title">Department Verification Clearance</h3>
               <span class="badge badge-pending" id="display-verified-count">2/4 VERIFIED</span>
             </div>
             <div class="gov-card-body">
@@ -261,7 +261,7 @@
         <!-- Document Status Section (Feature A + B Integration) -->
         <section class="gov-card" aria-labelledby="docs-section-title">
           <div class="gov-card-header">
-            <h3 id="docs-section-title" class="gov-card-title">&#128196; Application Documents &amp; Proof Status</h3>
+            <h3 id="docs-section-title" class="gov-card-title">Application Documents &amp; Proof Status</h3>
             <button type="button" class="btn btn-secondary btn-sm" onclick="openAttachDocModal()">
               + Attach Supporting Document (Prototype)
             </button>
@@ -286,7 +286,7 @@
 
             <div class="flex-between" style="font-size: 0.78rem; color: var(--color-text-light); margin-top: 0.4rem;">
               <div>
-                <span>&#128274; Safe Prototype Verification: Document metadata is verified against simulated departmental requirements.</span>
+                <span>Safe Prototype Verification: Document metadata is verified against simulated departmental requirements.</span>
               </div>
               <div id="display-docs-summary-count">
                 Total Documents: 1
@@ -298,7 +298,7 @@
         <!-- Chronological Application Timeline -->
         <section class="gov-card" aria-labelledby="timeline-section-title">
           <div class="gov-card-header">
-            <h3 id="timeline-section-title" class="gov-card-title">&#9201; Application Timeline &amp; Event History</h3>
+            <h3 id="timeline-section-title" class="gov-card-title">Application Timeline &amp; Event History</h3>
             <span class="badge badge-online">AUDIT SYNCHRONIZED</span>
           </div>
           <div class="gov-card-body">

@@ -79,14 +79,14 @@ const AuditApp = (function () {
     const btn = document.getElementById('btn-refresh-audit');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<span>&#x23F3;</span> Refreshing...';
+      btn.innerHTML = 'Refreshing...';
     }
 
     await init();
 
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<span>&#x21bb;</span> Refresh Logs';
+      btn.innerHTML = 'Refresh Logs';
     }
   }
 

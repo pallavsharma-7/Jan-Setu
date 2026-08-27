@@ -30,25 +30,21 @@ async function initHomeServiceHighlights() {
     // Map department-specific verification summaries
     const metaMap = {
       'business-reg': {
-        icon: '🏢',
         scope: 'Identity, Revenue (Address), Tax, Municipal',
         docs: 'Address Proof (.docx/.pdf), Business Name, Identity ID',
         badge: 'Unified 4-Dept Clearance'
       },
       'income-cert': {
-        icon: '📄',
         scope: 'Revenue Service & Identity',
         docs: 'Salary / Income Declaration, Residence Proof',
         badge: 'Revenue Verified'
       },
       'trade-license': {
-        icon: '🏬',
         scope: 'Municipal Corporation & Zoning',
         docs: 'Establishment Lease, Safety Declaration',
         badge: 'Municipal Clearance'
       },
       'property-tax-clearance': {
-        icon: '🏛️',
         scope: 'Tax Assessment & Revenue records',
         docs: 'Property ID, Assessment Receipt',
         badge: 'Tax Clearance'
@@ -57,7 +53,6 @@ async function initHomeServiceHighlights() {
 
     container.innerHTML = services.map(srv => {
       const meta = metaMap[srv.id] || {
-        icon: '📋',
         scope: srv.department || 'Department Service',
         docs: 'Standard Application Details',
         badge: 'Simulated Service'

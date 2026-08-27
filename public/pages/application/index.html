@@ -5,58 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Service Application | Jan-Setu Interoperability Prototype</title>
   <meta name="description" content="Apply for public services through the Jan-Setu prototype interoperability and service orchestration layer.">
-  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="application.css">
 </head>
 <body>
 
-  <!-- Top Announcement Bar -->
-  <div class="site-top-bar" role="region" aria-label="Prototype Notice">
-    <div class="container site-top-bar-inner">
-      <div class="top-bar-badge">
-        <span class="dot" aria-hidden="true"></span>
-        <span>Jan-Setu Prototype Interoperability Platform</span>
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Core Branch: <strong>pallav-core</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <img src="/assets/jan-setu-logo.jpg" alt="Jan-Setu Logo" class="gov-emblem-img">
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
       </div>
       <div>
-        <span>Simulated Government Service Adapters &bull; Hackathon Demo</span>
+        <span class="badge badge-online"><span class="status-indicator online"></span>APPLICATION FLOW ACTIVE</span>
       </div>
     </div>
-  </div>
 
-  <!-- Main Navigation Header -->
-  <header class="main-header" role="banner">
-    <div class="container header-container">
-      <a href="/" class="brand-logo-group" aria-label="Jan-Setu Home">
-        <div class="brand-emblem" aria-hidden="true">JS</div>
-        <div class="brand-title-wrap">
-          <span class="brand-title">JAN-SETU</span>
-          <span class="brand-subtitle">Simulated Service Orchestration Layer</span>
-        </div>
-      </a>
-      <nav class="main-nav" aria-label="Primary Navigation">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/pages/services/" class="nav-link">Services Catalog</a>
-        <a href="/pages/application/" class="nav-link active" aria-current="page">Apply</a>
-        <a href="/pages/tracking/" class="nav-link">Track Status</a>
-        <a href="/pages/dashboard/" class="nav-link">Department Dashboard</a>
-        <a href="/pages/audit/" class="nav-link">Audit Log</a>
-        <a href="/pages/monitoring/" class="nav-link">Monitoring</a>
-      </nav>
-    </div>
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link">Services</a>
+        <a href="/pages/application/" class="gov-nav-link active" aria-current="page">Apply</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
+        <a href="/pages/dashboard/" class="gov-nav-link">Department Dashboard</a>
+        <a href="/pages/audit/" class="gov-nav-link">Audit Log</a>
+        <a href="/pages/monitoring/" class="gov-nav-link">System Status</a>
+      </div>
+    </nav>
   </header>
 
-  <!-- Page Banner -->
-  <section class="page-hero" aria-labelledby="page-title">
-    <div class="container">
-      <h1 id="page-title" class="page-hero-title">Citizen Service Application</h1>
-      <p class="page-hero-subtitle">
-        Apply for municipal, revenue, and commercial services. Jan-Setu coordinates minimum required data verification between simulated departmental adapters.
-      </p>
-    </div>
-  </section>
-
   <!-- Main Application Form Area -->
-  <main class="container application-page-wrapper">
+  <main class="page-container application-page-wrapper">
 
     <!-- Step Progress Indicator -->
     <nav class="step-indicator-bar" aria-label="Application Progress">
@@ -415,49 +406,44 @@
     </div>
   </main>
 
-  <!-- Site Footer -->
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <div class="footer-container">
-        <div class="footer-brand">
-          <h4>JAN-SETU</h4>
-          <p>
-            An interoperability and service-orchestration prototype connecting simulated departmental verification adapters to eliminate repetitive citizen paperwork.
-          </p>
-          <div class="prototype-notice-tag">
-            Simulated Prototype &bull; No Real Government Affiliation
-          </div>
-        </div>
-        <div class="footer-col">
-          <h5>Platform Navigation</h5>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/pages/services/">Services Catalog</a></li>
-            <li><a href="/pages/application/">Application Flow</a></li>
-            <li><a href="/pages/tracking/">Application Tracking</a></li>
-            <li><a href="/pages/dashboard/">Department Dashboard</a></li>
-            <li><a href="/pages/audit/">Audit Log</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h5>Department Adapters</h5>
-          <ul>
-            <li><a href="/pages/department/">Identity Verification Service</a></li>
-            <li><a href="/pages/department/">Revenue Verification Service</a></li>
-            <li><a href="/pages/department/">Tax Verification Service</a></li>
-            <li><a href="/pages/department/">Municipal Service</a></li>
-          </ul>
-        </div>
+  <!-- Official Footer -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          An interoperability and service-orchestration prototype connecting simulated departmental verification adapters to eliminate repetitive citizen paperwork.
+        </p>
       </div>
-      <div class="footer-bottom">
-        &copy; 2026 Jan-Setu Project. Built for demonstration and simulated public service interoperability.
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+          <li><a href="/pages/dashboard/">Department Dashboard</a></li>
+          <li><a href="/pages/audit/">Audit Log</a></li>
+        </ul>
       </div>
+      <div class="gov-footer-links">
+        <h4>Simulated Services</h4>
+        <ul>
+          <li>Identity Service (Online)</li>
+          <li>Revenue Service (Online)</li>
+          <li>Tax Service (Online)</li>
+          <li>Municipal Service (Online)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Module: Application Flow (Tanishka).
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="../../js/api.js"></script>
-  <script src="../../js/shared.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
   <script src="application.js"></script>
 </body>
 </html>

@@ -21,7 +21,7 @@
 
     <div class="gov-brand-container">
       <div class="gov-brand">
-        <div class="gov-emblem">JS</div>
+        <img src="/assets/jan-setu-logo.jpg" alt="Jan-Setu Logo" class="gov-emblem-img">
         <div class="gov-title-group">
           <h1>JAN-SETU</h1>
           <div class="gov-subtitle">Unified Service Orchestration Platform</div>
@@ -66,10 +66,10 @@
       </div>
       <div class="audit-hero-actions">
         <button id="btn-refresh-audit" class="btn btn-outline" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" onclick="AuditApp.refreshData()">
-          <span>&#x21bb;</span> Refresh Logs
+          Refresh Logs
         </button>
         <button class="btn btn-secondary" onclick="AuditApp.exportJSON()">
-          <span>&#x1F4BE;</span> Copy JSON
+          Copy JSON
         </button>
         <a href="/pages/dashboard/" class="btn btn-primary">
           <span>&larr;</span> Back to Dashboard
@@ -116,7 +116,7 @@
     <section class="gov-card" aria-labelledby="audit-registry-heading">
       <div class="gov-card-header flex-between flex-wrap gap-1">
         <div>
-          <h2 id="audit-registry-heading" class="gov-card-title">&#x1F5C4;&#xFE0F; Audit Event Stream</h2>
+          <h2 id="audit-registry-heading" class="gov-card-title">Audit Event Stream</h2>
           <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">Comprehensive verification event chronology and data access telemetry</p>
         </div>
         <div>
@@ -207,7 +207,7 @@
 
         <!-- Empty State -->
         <div id="audit-empty-state" class="empty-state-box" style="display: none;">
-          <div class="empty-state-icon">&#x1F50D;</div>
+          <div class="empty-state-icon"></div>
           <div class="empty-state-title">No Audit Records Match Query</div>
           <p class="empty-state-desc">No events matched your current search filters. Try adjusting your parameters or clear the filters.</p>
           <button class="btn btn-secondary btn-sm" onclick="AuditApp.resetFilters()">Clear Filters</button>

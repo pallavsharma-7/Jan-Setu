@@ -323,7 +323,7 @@ const DashboardApp = (function () {
               <a href="/pages/tracking/?id=${encodeURIComponent(app.id)}" class="app-id-link" title="Open in Application Tracker">
                 ${JanSetuUI.escapeHtml(app.id)}
               </a>
-              <button class="copy-btn" title="Copy Application ID" onclick="DashboardApp.copyId('${JanSetuUI.escapeHtml(app.id)}')">&#x1F4CB;</button>
+              <button class="copy-btn" title="Copy Application ID" onclick="DashboardApp.copyId('${JanSetuUI.escapeHtml(app.id)}')">Copy</button>
             </div>
           </td>
           <td>
