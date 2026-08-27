@@ -424,6 +424,43 @@ function updateServiceStatus(serviceName, status) {
   return { success: false, error: "Invalid service name" };
 }
 
+function addDocumentToApplication(applicationId, docData) {
+  const app = applications[applicationId];
+  if (!app) return { success: false, status: 404, error: "Application not found" };
+
+  if (!docData || !docData.name) {
+    return { success: false, status: 400, error: "Document name is required" };
+  }
+
+  const docId = `DOC-${Date.now().toString().slice(-4)}`;
+  const newDoc = {
+    id: docData.id || docId,
+    name: docData.name,
+    type: docData.type || (docData.name.includes('.') ? docData.name.split('.').pop().toLowerCase() : 'pdf'),
+    size: docData.size || '150 KB',
+    uploadState: docData.uploadState || 'uploaded',
+    verificationState: docData.verificationState || 'pending'
+  };
+
+  if (!Array.isArray(app.documents)) {
+    app.documents = [];
+  }
+
+  app.documents.push(newDoc);
+  app.updatedAt = new Date().toISOString();
+
+  app.timeline.push({
+    timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+    department: "Jan-Setu Gateway",
+    action: "Document Uploaded",
+    detail: `Citizen attached supporting document: ${newDoc.name} (${newDoc.size})`
+  });
+
+  addAuditRecord("Jan-Setu Gateway", "Document Attachment", "Supporting Document Upload", "Uploaded", applicationId);
+
+  return { success: true, document: newDoc, application: app };
+}
+
 module.exports = {
   serviceStatuses,
   availableServices,
@@ -436,5 +473,6 @@ module.exports = {
   orchestrateApplication,
   createNewApplication,
   updateServiceStatus,
+  addDocumentToApplication,
   addAuditRecord
 };

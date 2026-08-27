@@ -172,6 +172,23 @@ const JanSetuAPI = {
       console.error('API Error (getAudit):', err);
       return [];
     }
+  },
+
+  /**
+   * 11. Add/Attach Prototype Document to an Application
+   */
+  async addDocument(applicationId, documentData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/applications/${applicationId}/documents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(documentData)
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (addDocument):', err);
+      return { error: err.message };
+    }
   }
 };
 

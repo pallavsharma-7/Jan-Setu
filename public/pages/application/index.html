@@ -171,6 +171,32 @@
                 </div>
               </fieldset>
 
+              <!-- Supporting Documents Fieldset (Feature A - Palak) -->
+              <fieldset class="form-section-fieldset" id="documents-fieldset">
+                <legend class="form-section-legend">Supporting Documents (Prototype Upload)</legend>
+
+                <div class="form-hint" style="margin-bottom: 0.75rem;">
+                  Attach required proof documents. Supported formats: <strong>.pdf, .docx, .doc, .jpg, .png</strong> (Max 5MB each). In this prototype, documents are verified through simulated adapter metadata.
+                </div>
+
+                <!-- Document Upload Dropzone -->
+                <div class="doc-upload-zone" id="doc-upload-dropzone" role="button" tabindex="0" aria-label="Click or drag files here to upload supporting documents">
+                  <div class="doc-upload-icon">&#128196;</div>
+                  <div class="doc-upload-title">Click to Browse or Drag &amp; Drop Documents</div>
+                  <div class="doc-upload-hint">Upload proofs (Identity, Address, Clearance documents)</div>
+                  <input type="file" id="doc-file-input" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png" multiple style="display: none;" aria-label="Upload document file">
+                </div>
+                <div id="err-documents" class="field-error-msg" role="alert">Please attach at least one supporting document.</div>
+
+                <!-- Attached Documents List -->
+                <div style="font-size: 0.82rem; font-weight: 700; color: var(--color-navy, #1b365d); margin-top: 0.5rem;">
+                  Attached Application Documents (<span id="attached-docs-count">1</span>):
+                </div>
+                <div class="attached-docs-list" id="attached-docs-container">
+                  <!-- Populated dynamically by application.js -->
+                </div>
+              </fieldset>
+
               <!-- Step 1 Navigation Buttons -->
               <div class="form-step-actions">
                 <a href="/pages/services/" class="btn btn-secondary">&larr; Back to Services</a>
@@ -229,6 +255,10 @@
                 <tr>
                   <th scope="row">Application Purpose</th>
                   <td id="review-applicant-notes">--</td>
+                </tr>
+                <tr>
+                  <th scope="row">Attached Documents</th>
+                  <td id="review-applicant-docs">--</td>
                 </tr>
               </tbody>
             </table>
