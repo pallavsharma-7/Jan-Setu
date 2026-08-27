@@ -81,13 +81,14 @@ All endpoints are local REST endpoints provided by our Express backend:
 | `/api/health` | `GET` | System health check |
 | `/api/services` | `GET` | List available service catalog |
 | `/api/services/status` | `GET` / `POST` | Get or toggle departmental service health (`online` / `offline`) |
-| `/api/applications` | `POST` | Submit new unified application & trigger orchestration |
+| `/api/applications` | `GET` / `POST` | List all applications or submit new unified application |
 | `/api/applications/:id` | `GET` | Get detailed application status & verification breakdown |
+| `/api/dashboard/stats` | `GET` | Retrieve aggregated department operational metrics & KPIs |
 | `/api/verify/identity` | `POST` | Trigger simulated Identity Service check |
 | `/api/verify/address` | `POST` | Trigger simulated Revenue/Address Service check |
 | `/api/verify/tax` | `POST` | Trigger simulated Tax Service check |
 | `/api/verify/municipal` | `POST` | Trigger simulated Municipal Service check |
-| `/api/audit` | `GET` | Access transparent audit trail of departmental data accesses |
+| `/api/audit` | `GET` | Access transparent audit trail of departmental data accesses with search/filter |
 
 ---
 
@@ -116,14 +117,14 @@ All endpoints are local REST endpoints provided by our Express backend:
 
 ## 8. Team Ownership & Branch Workflow
 
-| Developer | Feature / Page | Target Branch |
-| :--- | :--- | :--- |
-| **PALLAV** | Core Architecture, Server, API & Shared Design System | `pallav-core` |
-| **PATHIKA** | Home Page & Services Catalog | `origin/pallav-core` |
-| **TANISHKA** | Application Submission Form & Workflow | `origin/pallav-core` |
-| **PALAK** | Document Upload & Application Tracking UI | `origin/pallav-core` |
-| **RUCHA** | Department Officer Dashboard & Audit Log Viewer | `origin/pallav-core` |
-| **PARTH** | Interoperability Health Monitoring & Service Toggles | `origin/pallav-core` |
+| Developer | Feature / Page | Target Branch | Status |
+| :--- | :--- | :--- | :--- |
+| **PALLAV** | Core Architecture, Server, API & Shared Design System | `pallav-core` | COMPLETED |
+| **PATHIKA** | Home Page & Services Catalog | `pathika-home-services` | COMPLETED |
+| **TANISHKA** | Application Submission Form & Workflow | `tanishka-application` | COMPLETED |
+| **PALAK** | Document Upload & Application Tracking UI | `palak-documents-tracking` | COMPLETED |
+| **RUCHA** | Department Officer Dashboard & Audit Log Viewer | `rucha-dashboard-audit` | COMPLETED |
+| **PARTH** | Interoperability Health Monitoring & Service Toggles | `parth-monitoring` | NEXT |
 
 ---
 

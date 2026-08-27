@@ -51,6 +51,47 @@ router.post('/applications', (req, res) => {
   }
 });
 
+// 4b. GET /api/applications - Retrieve list of all applications
+router.get('/applications', (req, res) => {
+  try {
+    const { status, serviceId, search } = req.query;
+    let list = Object.values(data.applications);
+
+    if (status && status !== 'all') {
+      list = list.filter(app => (app.status || '').toLowerCase() === status.toLowerCase());
+    }
+
+    if (serviceId && serviceId !== 'all') {
+      list = list.filter(app => app.serviceId === serviceId || app.service === serviceId);
+    }
+
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(app => 
+        (app.id && app.id.toLowerCase().includes(q)) ||
+        (app.applicant && app.applicant.name && app.applicant.name.toLowerCase().includes(q)) ||
+        (app.applicant && app.applicant.email && app.applicant.email.toLowerCase().includes(q)) ||
+        (app.applicant && app.applicant.phone && app.applicant.phone.toLowerCase().includes(q)) ||
+        (app.service && app.service.toLowerCase().includes(q))
+      );
+    }
+
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch applications", message: err.message });
+  }
+});
+
+// 4c. GET /api/dashboard/stats - Retrieve aggregated operational statistics
+router.get('/dashboard/stats', (req, res) => {
+  try {
+    const stats = data.getDashboardStats();
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to compute dashboard stats", message: err.message });
+  }
+});
+
 // 5. GET /api/applications/:id - Fetch application details by ID
 router.get('/applications/:id', (req, res) => {
   const appId = req.params.id;
@@ -104,9 +145,39 @@ router.post('/verify/municipal', (req, res) => {
   res.json(result);
 });
 
-// 10. GET /api/audit - Retrieve access audit log
+// 10. GET /api/audit - Retrieve access audit log with optional search/filtering
 router.get('/audit', (req, res) => {
-  res.json(data.auditLogs);
+  const { applicationId, department, result, search } = req.query;
+  let logs = data.auditLogs;
+
+  if (applicationId) {
+    const aid = applicationId.toLowerCase();
+    logs = logs.filter(log => log.applicationId && log.applicationId.toLowerCase().includes(aid));
+  }
+
+  if (department && department !== 'all') {
+    const dept = department.toLowerCase();
+    logs = logs.filter(log => log.department && log.department.toLowerCase().includes(dept));
+  }
+
+  if (result && result !== 'all') {
+    const resQ = result.toLowerCase();
+    logs = logs.filter(log => log.result && log.result.toLowerCase().includes(resQ));
+  }
+
+  if (search) {
+    const q = search.toLowerCase();
+    logs = logs.filter(log =>
+      (log.id && log.id.toLowerCase().includes(q)) ||
+      (log.applicationId && log.applicationId.toLowerCase().includes(q)) ||
+      (log.department && log.department.toLowerCase().includes(q)) ||
+      (log.request && log.request.toLowerCase().includes(q)) ||
+      (log.purpose && log.purpose.toLowerCase().includes(q)) ||
+      (log.result && log.result.toLowerCase().includes(q))
+    );
+  }
+
+  res.json(logs);
 });
 
 module.exports = router;

@@ -162,11 +162,19 @@ const JanSetuAPI = {
   },
 
   /**
-   * 10. Get Audit Log
+   * 10. Get Audit Log (with optional filters: { applicationId, department, result, search })
    */
-  async getAudit() {
+  async getAudit(params = {}) {
     try {
-      const response = await fetch(`${API_BASE_URL}/audit`);
+      const query = new URLSearchParams();
+      if (params.applicationId) query.set('applicationId', params.applicationId);
+      if (params.department && params.department !== 'all') query.set('department', params.department);
+      if (params.result && params.result !== 'all') query.set('result', params.result);
+      if (params.search) query.set('search', params.search);
+
+      const qs = query.toString();
+      const url = qs ? `${API_BASE_URL}/audit?${qs}` : `${API_BASE_URL}/audit`;
+      const response = await fetch(url);
       return await response.json();
     } catch (err) {
       console.error('API Error (getAudit):', err);
@@ -188,6 +196,53 @@ const JanSetuAPI = {
     } catch (err) {
       console.error('API Error (addDocument):', err);
       return { error: err.message };
+    }
+  },
+
+  /**
+   * 12. Get All Applications (with optional filters: { status, serviceId, search })
+   */
+  async getApplications(params = {}) {
+    try {
+      const query = new URLSearchParams();
+      if (params.status && params.status !== 'all') query.set('status', params.status);
+      if (params.serviceId && params.serviceId !== 'all') query.set('serviceId', params.serviceId);
+      if (params.search) query.set('search', params.search);
+
+      const qs = query.toString();
+      const url = qs ? `${API_BASE_URL}/applications?${qs}` : `${API_BASE_URL}/applications`;
+      const response = await fetch(url);
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (getApplications):', err);
+      return [];
+    }
+  },
+
+  /**
+   * 13. Get Aggregated Dashboard Statistics
+   */
+  async getDashboardStats() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (getDashboardStats):', err);
+      return {
+        totalApplications: 0,
+        byStatus: { completed: 0, processing: 0, queued: 0, rejected: 0 },
+        byService: [],
+        verifications: {
+          identity: { verified: 0, queued: 0, pending: 0 },
+          address: { verified: 0, queued: 0, pending: 0 },
+          tax: { verified: 0, queued: 0, pending: 0 },
+          municipal: { verified: 0, queued: 0, pending: 0 }
+        },
+        serviceStatuses: {},
+        totalAuditLogs: 0,
+        recentApplications: [],
+        recentAuditLogs: []
+      };
     }
   }
 };

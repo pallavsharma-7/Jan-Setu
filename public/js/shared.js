@@ -13,12 +13,16 @@ const JanSetuUI = {
    * Automatically highlights active page in top navigation bar based on current URL path
    */
   initNavigation() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.gov-nav-link');
+    const currentPath = window.location.pathname.replace(/\/index\.html$/, '/');
+    const navLinks = document.querySelectorAll('.gov-nav-link, .nav-link');
     
     navLinks.forEach(link => {
       const href = link.getAttribute('href');
-      if (href && (currentPath === href || (href !== '/' && currentPath.startsWith(href)))) {
+      if (!href) return;
+      const normalizedHref = href.replace(/\/index\.html$/, '/');
+      if (currentPath === normalizedHref || (normalizedHref !== '/' && currentPath.startsWith(normalizedHref))) {
+        link.classList.add('active');
+      } else if (normalizedHref === '/' && (currentPath === '/' || currentPath === '')) {
         link.classList.add('active');
       }
     });

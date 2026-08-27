@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Dashboard | Jan-Setu Interoperability Platform</title>
+  <meta name="description" content="Department operator dashboard for monitoring unified citizen applications, cross-department verifications, and operational statistics on Jan-Setu.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Module: <strong>Department Dashboard & Audit (Rucha)</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <div class="gov-emblem">JS</div>
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div class="flex gap-1">
+        <span class="badge badge-online"><span class="status-indicator online"></span>OPERATIONS CONSOLE</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link">Services</a>
+        <a href="/pages/application/" class="gov-nav-link">Apply</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
+        <a href="/pages/dashboard/" class="gov-nav-link active" aria-current="page">Department Dashboard</a>
+        <a href="/pages/audit/" class="gov-nav-link">Audit Log</a>
+        <a href="/pages/monitoring/" class="gov-nav-link">System Status</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer" role="alert">
+      <div>
+        <strong>ADMINISTRATIVE OPERATIONS CONSOLE:</strong> Real-time overview of cross-departmental orchestrations, verification pipelines, and citizen service requests across simulated departmental adapters.
+      </div>
+    </div>
+
+    <!-- Dashboard Hero Header -->
+    <section class="dashboard-hero" aria-labelledby="dashboard-title">
+      <div>
+        <h1 id="dashboard-title" class="dashboard-hero-title">Department Operations Dashboard</h1>
+        <p class="dashboard-hero-subtitle">
+          Real-time oversight of unified citizen requests, cross-departmental verifications, and operational throughput across Identity, Revenue, Tax, and Municipal services.
+        </p>
+      </div>
+      <div class="dashboard-hero-actions">
+        <button id="btn-refresh-dashboard" class="btn btn-outline" style="color: #ffffff; border-color: rgba(255,255,255,0.4);" onclick="DashboardApp.refreshData()">
+          <span>&#x21bb;</span> Refresh Data
+        </button>
+        <a href="/pages/audit/" class="btn btn-secondary">
+          <span>&#x1F4CB;</span> View Audit Trail &rarr;
+        </a>
+        <a href="/pages/application/" class="btn btn-primary" style="background-color: var(--color-saffron); border-color: var(--color-saffron-dark);">
+          <span>+</span> New Application
+        </a>
+      </div>
+    </section>
+
+    <!-- Global Error Banner (Hidden by default) -->
+    <div id="dashboard-error-banner" class="alert alert-danger" style="display: none;" role="alert">
+      <div class="flex-between">
+        <span id="dashboard-error-message">Failed to communicate with Jan-Setu API service.</span>
+        <button class="btn btn-sm btn-danger" onclick="DashboardApp.init()">Retry</button>
+      </div>
+    </div>
+
+    <!-- Top KPI Metrics Cards -->
+    <section aria-labelledby="kpi-heading" style="margin-bottom: 1.5rem;">
+      <h2 id="kpi-heading" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;">Operational Key Performance Indicators</h2>
+      <div class="stats-grid" id="kpi-stats-container">
+        
+        <!-- Total Applications Card -->
+        <div class="stat-card primary">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Total Applications</span>
+            <span class="stat-card-icon">&#x1F4C1;</span>
+          </div>
+          <div class="stat-card-value" id="kpi-total-apps">--</div>
+          <div class="stat-card-footer">
+            <span>Cumulative submissions across 4 services</span>
+          </div>
+        </div>
+
+        <!-- Completed Applications Card -->
+        <div class="stat-card success">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Fully Completed</span>
+            <span class="stat-card-icon">&#x2705;</span>
+          </div>
+          <div class="stat-card-value" id="kpi-completed-apps" style="color: var(--color-success);">--</div>
+          <div class="stat-card-footer">
+            <span class="badge badge-online" id="kpi-completed-pct">0% Rate</span>
+            <span>All verifications cleared</span>
+          </div>
+        </div>
+
+        <!-- In Processing Card -->
+        <div class="stat-card info">
+          <div class="stat-card-header">
+            <span class="stat-card-title">In Processing</span>
+            <span class="stat-card-icon">&#x23F3;</span>
+          </div>
+          <div class="stat-card-value" id="kpi-processing-apps" style="color: var(--color-info);">--</div>
+          <div class="stat-card-footer">
+            <span>Active multi-department orchestration</span>
+          </div>
+        </div>
+
+        <!-- Queued / Pending Card -->
+        <div class="stat-card warning">
+          <div class="stat-card-header">
+            <span class="stat-card-title">Queued / Attention</span>
+            <span class="stat-card-icon">&#x26A0;</span>
+          </div>
+          <div class="stat-card-value" id="kpi-queued-apps" style="color: var(--color-warning);">--</div>
+          <div class="stat-card-footer">
+            <span>Awaiting offline service recovery</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Department Services & Distribution Grid -->
+    <div class="grid grid-2 gap-2" style="margin-bottom: 1.5rem;">
+      
+      <!-- Left Column: Department Health & Verification Pipeline -->
+      <div class="gov-card" style="margin-bottom: 0;">
+        <div class="gov-card-header">
+          <h2 class="gov-card-title">&#x1F3DB;&#xFE0F; Departmental Service Adapters</h2>
+          <span class="badge badge-online" id="dept-all-status-badge">4 SERVICES ACTIVE</span>
+        </div>
+        <div class="gov-card-body">
+          <p style="font-size: 0.84rem; margin-bottom: 1rem;">Live operational status of federated mock departmental endpoints:</p>
+          
+          <div class="services-status-grid" id="dept-services-status-container">
+            <!-- Dynamic Department Status Items -->
+            <div class="dept-status-card">
+              <div class="dept-status-info">
+                <span class="dept-status-name">Identity</span>
+                <span class="dept-status-sub">Citizen Check</span>
+              </div>
+              <span class="badge badge-online" id="status-badge-identity">ONLINE</span>
+            </div>
+            <div class="dept-status-card">
+              <div class="dept-status-info">
+                <span class="dept-status-name">Revenue</span>
+                <span class="dept-status-sub">Address Check</span>
+              </div>
+              <span class="badge badge-online" id="status-badge-revenue">ONLINE</span>
+            </div>
+            <div class="dept-status-card">
+              <div class="dept-status-info">
+                <span class="dept-status-name">Tax</span>
+                <span class="dept-status-sub">Compliance</span>
+              </div>
+              <span class="badge badge-online" id="status-badge-tax">ONLINE</span>
+            </div>
+            <div class="dept-status-card">
+              <div class="dept-status-info">
+                <span class="dept-status-name">Municipal</span>
+                <span class="dept-status-sub">Zoning & Dues</span>
+              </div>
+              <span class="badge badge-online" id="status-badge-municipal">ONLINE</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--color-border-light);">
+            <h3 style="font-size: 0.95rem; margin-bottom: 0.65rem;">Verification Stage Throughput</h3>
+            <div class="grid grid-2 gap-1" id="verification-stages-container">
+              <div style="background: var(--color-surface-alt); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);">
+                <div class="flex-between" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.2rem;">
+                  <span>Identity Verifications</span>
+                  <span id="v-count-identity" style="color: var(--color-success);">0 Verified</span>
+                </div>
+                <div class="progress-track"><div id="v-bar-identity" class="progress-bar-fill" style="width: 0%;"></div></div>
+              </div>
+              <div style="background: var(--color-surface-alt); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);">
+                <div class="flex-between" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.2rem;">
+                  <span>Revenue / Address</span>
+                  <span id="v-count-revenue" style="color: var(--color-success);">0 Verified</span>
+                </div>
+                <div class="progress-track"><div id="v-bar-revenue" class="progress-bar-fill" style="width: 0%;"></div></div>
+              </div>
+              <div style="background: var(--color-surface-alt); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);">
+                <div class="flex-between" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.2rem;">
+                  <span>Tax Compliance</span>
+                  <span id="v-count-tax" style="color: var(--color-success);">0 Verified</span>
+                </div>
+                <div class="progress-track"><div id="v-bar-tax" class="progress-bar-fill" style="width: 0%;"></div></div>
+              </div>
+              <div style="background: var(--color-surface-alt); padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);">
+                <div class="flex-between" style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.2rem;">
+                  <span>Municipal Clearance</span>
+                  <span id="v-count-municipal" style="color: var(--color-success);">0 Verified</span>
+                </div>
+                <div class="progress-track"><div id="v-bar-municipal" class="progress-bar-fill" style="width: 0%;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Applications by Service Breakdown -->
+      <div class="gov-card" style="margin-bottom: 0;">
+        <div class="gov-card-header">
+          <h2 class="gov-card-title">&#x1F4CA; Applications by Public Service</h2>
+          <a href="/pages/services/" class="btn btn-outline btn-sm">Service Catalog &rarr;</a>
+        </div>
+        <div class="gov-card-body" id="services-distribution-container">
+          <!-- Dynamic Service Distribution Items -->
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text" style="width: 80%;"></div>
+          <div class="skeleton skeleton-text" style="width: 60%;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Main Applications Management & Filter Section -->
+    <section class="gov-card" aria-labelledby="applications-table-heading">
+      <div class="gov-card-header flex-between flex-wrap gap-1">
+        <div>
+          <h2 id="applications-table-heading" class="gov-card-title">&#x1F4DD; Citizen Applications Registry</h2>
+          <p style="font-size: 0.8rem; color: var(--color-text-light); margin: 0;">Comprehensive operational ledger of active and archived citizen requests</p>
+        </div>
+        <div class="flex gap-1">
+          <span id="applications-count-badge" class="badge badge-pending">Loading...</span>
+        </div>
+      </div>
+
+      <div class="gov-card-body" style="padding-bottom: 0.5rem;">
+        
+        <!-- Filter and Search Toolbar -->
+        <div class="toolbar-section">
+          <div class="toolbar-grid">
+            
+            <!-- Search Box -->
+            <div>
+              <label for="filter-search" class="filter-label">Search Applications</label>
+              <input type="text" id="filter-search" class="form-input" placeholder="Search by ID, Name, Phone, Email..." oninput="DashboardApp.applyFilters()">
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+              <label for="filter-status" class="filter-label">Status</label>
+              <select id="filter-status" class="form-select" onchange="DashboardApp.applyFilters()">
+                <option value="all">All Statuses</option>
+                <option value="processing">Processing</option>
+                <option value="completed">Completed</option>
+                <option value="queued">Queued</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <!-- Service Filter -->
+            <div>
+              <label for="filter-service" class="filter-label">Service Type</label>
+              <select id="filter-service" class="form-select" onchange="DashboardApp.applyFilters()">
+                <option value="all">All Services</option>
+                <option value="business-reg">Business Registration</option>
+                <option value="income-cert">Income Certificate</option>
+                <option value="trade-license">Trade License</option>
+                <option value="property-tax-clearance">Property Tax Clearance</option>
+              </select>
+            </div>
+
+            <!-- Sort By -->
+            <div>
+              <label for="filter-sort" class="filter-label">Sort Order</label>
+              <select id="filter-sort" class="form-select" onchange="DashboardApp.applyFilters()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="status">Status</option>
+                <option value="name">Applicant Name</option>
+              </select>
+            </div>
+
+            <!-- Reset Button -->
+            <div>
+              <button class="btn btn-outline" style="width: 100%; white-space: nowrap;" onclick="DashboardApp.resetFilters()">
+                Reset
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Table View Container -->
+        <div class="gov-table-container">
+          <table class="gov-table" id="applications-table" aria-label="Applications Registry">
+            <thead>
+              <tr>
+                <th scope="col">Application ID</th>
+                <th scope="col">Citizen / Applicant</th>
+                <th scope="col">Service & Department</th>
+                <th scope="col">Status</th>
+                <th scope="col">Verifications</th>
+                <th scope="col">Documents</th>
+                <th scope="col">Submitted</th>
+                <th scope="col" style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="applications-table-body">
+              <!-- Dynamic Rows inserted via JS -->
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 2rem;">
+                  <div class="loading-spinner" style="margin-right: 0.5rem;"></div> Loading applications registry...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Empty State Container (Hidden by default) -->
+        <div id="applications-empty-state" class="empty-state-box" style="display: none;">
+          <div class="empty-state-icon">&#x1F50D;</div>
+          <div class="empty-state-title">No Applications Found</div>
+          <p class="empty-state-desc">No citizen applications match your current search filters. Try adjusting your query or submit a new test application.</p>
+          <button class="btn btn-secondary btn-sm" onclick="DashboardApp.resetFilters()">Clear Filters</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Recent Inter-Departmental Activity Stream & Quick Actions -->
+    <div class="grid grid-2 gap-2" style="margin-bottom: 2rem;">
+      
+      <!-- Recent Activity Stream -->
+      <div class="gov-card" style="margin-bottom: 0;">
+        <div class="gov-card-header flex-between">
+          <h2 class="gov-card-title">&#x23F1;&#xFE0F; Recent Activity & Audit Feed</h2>
+          <a href="/pages/audit/" class="btn btn-outline btn-sm">Full Audit Trail &rarr;</a>
+        </div>
+        <div class="gov-card-body">
+          <ul class="activity-stream" id="recent-activity-stream">
+            <li class="activity-item">
+              <div class="loading-spinner"></div> Loading recent audit feed...
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Operational Guidance & Interoperability Quick Links -->
+      <div class="gov-card" style="margin-bottom: 0;">
+        <div class="gov-card-header">
+          <h2 class="gov-card-title">&#x2699;&#xFE0F; Operator Tools & Guidance</h2>
+        </div>
+        <div class="gov-card-body">
+          <div style="background-color: var(--color-info-bg); border: 1px solid var(--color-info-border); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem;">
+            <strong style="color: var(--color-info); font-size: 0.9rem;">Orchestration Principle:</strong>
+            <p style="font-size: 0.82rem; margin: 0.35rem 0 0 0; color: var(--color-navy);">
+              Jan-Setu queries department adapters on-demand without centralizing databases. If a service is offline, requests are resiliently held in the queue.
+            </p>
+          </div>
+
+          <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">Quick System Actions</h3>
+          <div class="grid grid-2 gap-1">
+            <a href="/pages/audit/" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+              <span>&#x1F4CB;</span> Full Audit Viewer
+            </a>
+            <a href="/pages/tracking/" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+              <span>&#x1F50E;</span> Citizen Tracker UI
+            </a>
+            <a href="/pages/application/" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+              <span>&#x270F;&#xFE0F;</span> Citizen Apply Form
+            </a>
+            <a href="/pages/monitoring/" class="btn btn-outline btn-sm" style="text-align: left; justify-content: flex-start;">
+              <span>&#x1F6A6;</span> Service Health Toggles
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+          Demonstrating federated data exchange, automated verification workflows, and operator dashboard oversight.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+          <li><a href="/pages/dashboard/">Department Dashboard</a></li>
+          <li><a href="/pages/audit/">Audit Trail</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Department Adapters</h4>
+        <ul>
+          <li>Identity Service (Simulated)</li>
+          <li>Revenue Service (Simulated)</li>
+          <li>Tax Service (Simulated)</li>
+          <li>Municipal Service (Simulated)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Module: Department Dashboard & Audit (Rucha).
+    </div>
+  </footer>
+
+  <!-- JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
