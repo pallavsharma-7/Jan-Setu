@@ -185,6 +185,17 @@
     displayAppUpdated.textContent = formatDate(app.updatedAt);
     displayAppConsent.textContent = app.consent ? 'Explicit Consent Captured' : 'Pending';
 
+    const displayAppPayment = document.getElementById('display-app-payment');
+    if (displayAppPayment) {
+      const isPaid = app.paymentStatus === 'paid';
+      const fee = app.feeAmount || 150;
+      if (isPaid) {
+        displayAppPayment.innerHTML = `<span class="badge badge-online">PAID (₹${fee})</span> <a href="/pages/wallet/" style="font-size: 0.75rem; text-decoration: underline; margin-left: 4px;">View Wallet</a>`;
+      } else {
+        displayAppPayment.innerHTML = `<span class="badge badge-warning">DUE (₹${fee})</span> <a href="/pages/wallet/?appId=${encodeURIComponent(app.id)}&amount=${encodeURIComponent(fee)}" class="btn btn-secondary btn-sm" style="padding: 1px 6px; font-size: 0.72rem; margin-left: 6px;">Pay in Demo Wallet &rarr;</a>`;
+      }
+    }
+
     // Application Status Pill & Header Class
     const status = (app.status || 'processing').toLowerCase();
     appHeaderContainer.className = `app-header-card status-${status}`;

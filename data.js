@@ -21,6 +21,10 @@ const availableServices = [
     name: "Business Registration (Unified)",
     department: "Municipal & Revenue",
     description: "Single-window clearance for commercial enterprise registration across departments.",
+    fee: 150,
+    feeDisplay: "₹150 (Simulated Demo)",
+    requiredDocs: ["Address Proof (.docx/.pdf)", "Business Name", "Identity Verification"],
+    estimatedTime: "Simulated Instant (Parallel Orchestration)",
     active: true
   },
   {
@@ -28,6 +32,10 @@ const availableServices = [
     name: "Income Certificate Issuance",
     department: "Revenue Service",
     description: "Revenue-verified annual income certificate generation.",
+    fee: 50,
+    feeDisplay: "₹50 (Simulated Demo)",
+    requiredDocs: ["Income Declaration", "Residence Proof", "Citizen Identity"],
+    estimatedTime: "Simulated Instant",
     active: true
   },
   {
@@ -35,6 +43,10 @@ const availableServices = [
     name: "Trade License Renewal",
     department: "Municipal Service",
     description: "Annual commercial clearance and operating permit renewal.",
+    fee: 250,
+    feeDisplay: "₹250 (Simulated Demo)",
+    requiredDocs: ["Establishment Lease", "Safety Declaration", "Prior License Number"],
+    estimatedTime: "Simulated Instant",
     active: true
   },
   {
@@ -42,6 +54,10 @@ const availableServices = [
     name: "Property Tax Clearance",
     department: "Tax Service",
     description: "Unified property tax assessment and clearance certificate.",
+    fee: 100,
+    feeDisplay: "₹100 (Simulated Demo)",
+    requiredDocs: ["Property Assessment ID", "Last Assessment Receipt"],
+    estimatedTime: "Simulated Instant",
     active: true
   }
 ];
@@ -126,6 +142,9 @@ let applications = {
     },
     status: "processing", // options: "processing", "completed", "queued", "rejected"
     consent: true,
+    paymentStatus: "paid",
+    feeAmount: 150,
+    paymentReceipt: "REC-2026-9002",
     documents: [
       {
         id: "DOC-001",
@@ -150,6 +169,7 @@ let applications = {
     },
     timeline: [
       { timestamp: "2026-08-26 10:00:00", department: "Jan-Setu Gateway", action: "Application Created", detail: "Consent captured. Interoperability orchestration initiated." },
+      { timestamp: "2026-08-26 10:00:02", department: "Demo Wallet Service", action: "Payment Settled", detail: "Simulated fee ₹150.00 settled via Demo Wallet (REC-2026-9002)." },
       { timestamp: "2026-08-26 10:00:05", department: "Identity Service", action: "Identity Check", detail: "Citizen record matched & verified." },
       { timestamp: "2026-08-26 10:00:15", department: "Revenue Service", action: "Address Check", detail: "Residence status confirmed against local revenue records." }
     ],
@@ -167,6 +187,9 @@ let applications = {
     },
     status: "completed",
     consent: true,
+    paymentStatus: "paid",
+    feeAmount: 50,
+    paymentReceipt: "REC-2026-8841",
     documents: [
       {
         id: "DOC-002",
@@ -191,6 +214,7 @@ let applications = {
     },
     timeline: [
       { timestamp: "2026-08-26 11:30:00", department: "Jan-Setu Gateway", action: "Application Created", detail: "Consent captured. Interoperability orchestration initiated." },
+      { timestamp: "2026-08-26 11:30:02", department: "Demo Wallet Service", action: "Payment Settled", detail: "Simulated fee ₹50.00 settled via Demo Wallet (REC-2026-8841)." },
       { timestamp: "2026-08-26 11:30:05", department: "Identity Service", action: "Identity Check", detail: "Citizen record matched & verified." },
       { timestamp: "2026-08-26 11:30:12", department: "Revenue Service", action: "Address Check", detail: "Residence status confirmed against local revenue records." },
       { timestamp: "2026-08-26 11:30:20", department: "Tax Service", action: "Tax Clearance", detail: "Tax filing verified and cleared." },
@@ -210,6 +234,9 @@ let applications = {
     },
     status: "queued",
     consent: true,
+    paymentStatus: "pending",
+    feeAmount: 250,
+    paymentReceipt: null,
     documents: [
       {
         id: "DOC-003",
@@ -492,6 +519,9 @@ function createNewApplication(data) {
     },
     status: "processing",
     consent: data.consent !== undefined ? Boolean(data.consent) : true,
+    paymentStatus: data.paymentStatus || "pending",
+    feeAmount: data.feeAmount || (availableServices.find(s => s.id === (data.serviceId || "business-reg"))?.fee || 150),
+    paymentReceipt: data.paymentReceipt || null,
     documents: data.documents || [
       {
         id: `DOC-${Date.now().toString().slice(-3)}`,
@@ -977,11 +1007,423 @@ function probeDepartmentService(department) {
   };
 }
 
+// -------------------------------------------------------------
+// PALAK - DEMO WALLET / SIMULATED PAYMENT STATE & OPERATIONS
+// -------------------------------------------------------------
+
+let demoWallet = {
+  accountHolder: "Aarav Sharma",
+  accountNumber: "JS-WAL-8820-2026",
+  balance: 1000.00,
+  currency: "INR",
+  status: "active",
+  lastUpdated: new Date().toISOString()
+};
+
+let walletTransactions = [
+  {
+    id: "TXN-2026-9001",
+    type: "credit",
+    amount: 1000.00,
+    category: "Initial Demo Grant",
+    method: "Prototype Seed",
+    description: "Initial prototype demo balance allocation",
+    referenceId: "GRANT-SEED-01",
+    receiptId: "REC-2026-9001",
+    status: "completed",
+    timestamp: "2026-08-26 09:30:00"
+  },
+  {
+    id: "TXN-2026-9002",
+    type: "debit",
+    amount: 150.00,
+    category: "Application Fee",
+    method: "Demo Wallet",
+    description: "Simulated fee for Business Registration (Unified)",
+    referenceId: "JS-2026-001",
+    receiptId: "REC-2026-9002",
+    status: "completed",
+    timestamp: "2026-08-26 10:00:02"
+  },
+  {
+    id: "TXN-2026-9003",
+    type: "debit",
+    amount: 50.00,
+    category: "Application Fee",
+    method: "Demo Wallet",
+    description: "Simulated fee for Income Certificate Issuance",
+    referenceId: "JS-2026-002",
+    receiptId: "REC-2026-8841",
+    status: "completed",
+    timestamp: "2026-08-26 11:30:02"
+  }
+];
+
+let txnCounter = 9004;
+
+function getWalletData() {
+  let totalCredited = 0;
+  let totalDebited = 0;
+
+  walletTransactions.forEach(t => {
+    if (t.type === "credit") totalCredited += Number(t.amount || 0);
+    else if (t.type === "debit") totalDebited += Number(t.amount || 0);
+  });
+
+  return {
+    ...demoWallet,
+    totalCredited: Math.round(totalCredited * 100) / 100,
+    totalDebited: Math.round(totalDebited * 100) / 100,
+    transactionCount: walletTransactions.length
+  };
+}
+
+function topupWallet({ amount, method = "Simulated UPI", remarks = "Demo Wallet Top-Up" }) {
+  const numAmount = Number(amount);
+  if (isNaN(numAmount) || numAmount <= 0) {
+    return { success: false, status: 400, error: "Invalid amount. Top-up amount must be a positive number greater than 0." };
+  }
+  if (numAmount > 50000) {
+    return { success: false, status: 400, error: "Maximum simulated top-up per transaction is ₹50,000." };
+  }
+
+  demoWallet.balance = Math.round((demoWallet.balance + numAmount) * 100) / 100;
+  demoWallet.lastUpdated = new Date().toISOString();
+
+  const txnId = `TXN-2026-${String(txnCounter++).padStart(4, '0')}`;
+  const dateStr = new Date().toISOString().split("T")[0];
+  const timeStr = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const refId = `TOPUP-${Date.now().toString().slice(-6)}`;
+  const receiptId = `REC-2026-${Date.now().toString().slice(-5)}`;
+
+  const newTxn = {
+    id: txnId,
+    type: "credit",
+    amount: numAmount,
+    category: "Wallet Top-Up",
+    method: method || "Simulated UPI",
+    description: remarks || "Simulated Wallet Top-Up",
+    referenceId: refId,
+    receiptId: receiptId,
+    status: "completed",
+    timestamp: `${dateStr} ${timeStr}`
+  };
+
+  walletTransactions.unshift(newTxn);
+
+  addAuditRecord(
+    "Demo Wallet Service",
+    "Simulated Wallet Top-Up",
+    "Demo Balance Addition",
+    `Credited ₹${numAmount.toFixed(2)} (New Balance: ₹${demoWallet.balance.toFixed(2)})`,
+    refId
+  );
+
+  return {
+    success: true,
+    message: `Successfully topped up ₹${numAmount.toFixed(2)} in demo wallet`,
+    balance: demoWallet.balance,
+    transaction: newTxn,
+    wallet: getWalletData()
+  };
+}
+
+function payWithWallet({ applicationId, serviceId, amount, purpose }) {
+  let fee = Number(amount);
+  let app = null;
+
+  if (applicationId) {
+    app = applications[applicationId];
+    if (app && (!fee || isNaN(fee))) {
+      fee = app.feeAmount || 150;
+    }
+  }
+
+  if (isNaN(fee) || fee <= 0) {
+    return { success: false, status: 400, error: "Invalid payment amount. Amount must be greater than 0." };
+  }
+
+  if (demoWallet.balance < fee) {
+    return {
+      success: false,
+      status: 400,
+      error: `Insufficient balance in Demo Wallet. Required: ₹${fee.toFixed(2)}, Available: ₹${demoWallet.balance.toFixed(2)}. Please top up your demo wallet.`,
+      required: fee,
+      available: demoWallet.balance
+    };
+  }
+
+  demoWallet.balance = Math.round((demoWallet.balance - fee) * 100) / 100;
+  demoWallet.lastUpdated = new Date().toISOString();
+
+  const txnId = `TXN-2026-${String(txnCounter++).padStart(4, '0')}`;
+  const receiptId = `REC-2026-${Date.now().toString().slice(-5)}`;
+  const dateStr = new Date().toISOString().split("T")[0];
+  const timeStr = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const desc = purpose || (app ? `Simulated fee for ${app.service}` : `Simulated Service Payment (${serviceId || 'Standard'})`);
+
+  const newTxn = {
+    id: txnId,
+    type: "debit",
+    amount: fee,
+    category: "Application Fee",
+    method: "Demo Wallet",
+    description: desc,
+    referenceId: applicationId || serviceId || "SERVICE-FEE",
+    receiptId: receiptId,
+    status: "completed",
+    timestamp: `${dateStr} ${timeStr}`
+  };
+
+  walletTransactions.unshift(newTxn);
+
+  if (app) {
+    app.paymentStatus = "paid";
+    app.paymentReceipt = receiptId;
+    app.updatedAt = new Date().toISOString();
+    app.timeline.push({
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      department: "Demo Wallet Service",
+      action: "Payment Settled",
+      detail: `Simulated statutory fee ₹${fee.toFixed(2)} settled via Demo Wallet (Receipt: ${receiptId})`
+    });
+  }
+
+  addAuditRecord(
+    "Demo Wallet Service",
+    "Simulated Fee Settlement",
+    "Application Fee Payment",
+    `Debited ₹${fee.toFixed(2)} (Receipt: ${receiptId})`,
+    applicationId || "N/A"
+  );
+
+  return {
+    success: true,
+    message: `Payment of ₹${fee.toFixed(2)} settled successfully via Demo Wallet`,
+    balance: demoWallet.balance,
+    receiptId,
+    transaction: newTxn,
+    application: app || null,
+    wallet: getWalletData()
+  };
+}
+
+function getWalletTransactions(params = {}) {
+  let list = [...walletTransactions];
+  const { type, search } = params;
+
+  if (type && type !== "all") {
+    list = list.filter(t => t.type.toLowerCase() === type.toLowerCase());
+  }
+
+  if (search) {
+    const q = search.toLowerCase();
+    list = list.filter(t =>
+      (t.id && t.id.toLowerCase().includes(q)) ||
+      (t.description && t.description.toLowerCase().includes(q)) ||
+      (t.referenceId && t.referenceId.toLowerCase().includes(q)) ||
+      (t.category && t.category.toLowerCase().includes(q)) ||
+      (t.receiptId && t.receiptId.toLowerCase().includes(q))
+    );
+  }
+
+  return list;
+}
+
+function resetWallet() {
+  demoWallet.balance = 1000.00;
+  demoWallet.lastUpdated = new Date().toISOString();
+  walletTransactions = [
+    {
+      id: "TXN-2026-9001",
+      type: "credit",
+      amount: 1000.00,
+      category: "Initial Demo Grant",
+      method: "Prototype Seed",
+      description: "Initial prototype demo balance allocation",
+      referenceId: "GRANT-SEED-01",
+      receiptId: "REC-2026-9001",
+      status: "completed",
+      timestamp: "2026-08-26 09:30:00"
+    }
+  ];
+  return { success: true, balance: demoWallet.balance, wallet: getWalletData() };
+}
+
+// -------------------------------------------------------------
+// PALAK - AI CITIZEN ASSISTANT KNOWLEDGE CONTEXT & ENGINE
+// -------------------------------------------------------------
+
+function getJanSetuSystemContext() {
+  const serviceListText = availableServices.map(s =>
+    `- ${s.name} (ID: ${s.id}, Department: ${s.department}): ${s.description}. Required Documents: ${s.requiredDocs ? s.requiredDocs.join(', ') : 'Standard proofs'}. Fee: ${s.feeDisplay || '₹150 (Demo)'}.`
+  ).join('\n');
+
+  return `You are Jan-Setu AI Assistant, the official citizen guidance helper for the Jan-Setu Unified Interoperability & Service Orchestration Platform.
+
+PORTAL OVERVIEW:
+Jan-Setu is a modern government interoperability layer that eliminates redundant paperwork. Instead of submitting documents repeatedly to different government offices, a citizen submits one single application. Jan-Setu then coordinates parallel automated verification across 4 independent departmental adapters:
+1. Identity Service (Civil verification)
+2. Revenue Service (Address and residence proof verification)
+3. Tax Service (Tax compliance & clearance checks)
+4. Municipal Service (Urban zoning, commercial clearances, trade license checks)
+
+AVAILABLE SERVICES CATALOG:
+${serviceListText}
+
+KEY PLATFORM SECTIONS & HOW TO USE:
+- Apply for Services: Go to /pages/application/ to submit a unified application with citizen consent.
+- Track Application: Go to /pages/tracking/ and enter the Application ID (e.g., JS-2026-001) to view real-time stage progress, document status, and department logs.
+- Services Catalog: Go to /pages/services/ to explore all available services, eligibility, and participating adapters.
+- Demo Digital Wallet: Go to /pages/wallet/ to view simulated balance, top up demo funds, and settle application fees.
+- Department Dashboard: Go to /pages/dashboard/ for operational metrics and service performance.
+- Audit Log: Go to /pages/audit/ for immutable records of every cross-department verification query.
+- System Status: Go to /pages/monitoring/ for live adapter telemetry, uptime, and latency.
+
+RULES & BOUNDARIES:
+1. Provide concise, clear, polite, and well-structured answers using markdown bullet points.
+2. Clearly explain how to use the portal, what documents are required, and how orchestration works.
+3. State that Jan-Setu is an interoperability demonstration platform and does not connect to real citizen records.
+4. Never make fabricated legal guarantees or claim official authority.
+5. If the user asks about payment or wallet, guide them to the Demo Wallet at /pages/wallet/.`;
+}
+
+function getDeterministicKnowledgeReply(userMessage) {
+  const msg = (userMessage || '').toLowerCase().trim();
+
+  if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('namaste')) {
+    return `Namaste! Welcome to **Jan-Setu Citizen Assistant**. I can help you with:
+- **Available Government Services** and eligibility
+- **Required Documents** for each service
+- **How to Apply** through our unified single-window portal
+- **How to Track** your application status in real-time
+- **Demo Digital Wallet** top-up and simulated fee payments
+- **Cross-Department Verification** architecture
+
+How may I assist you today?`;
+  }
+
+  if (msg.includes('business') || msg.includes('enterprise') || msg.includes('company') || msg.includes('registration')) {
+    return `### Business Registration (Unified)
+**Department:** Municipal & Revenue Services
+**Simulated Fee:** ₹150 (Demo Wallet)
+**Required Documents:**
+- Address Proof (.docx / .pdf)
+- Business Name & Details
+- Citizen Identity ID
+
+**How It Works:** Jan-Setu coordinates verifications across Identity, Revenue, Tax, and Municipal services simultaneously.
+👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=business-reg)`;
+  }
+
+  if (msg.includes('income') || msg.includes('salary') || msg.includes('certificate')) {
+    return `### Income Certificate Issuance
+**Department:** Revenue Service
+**Simulated Fee:** ₹50 (Demo Wallet)
+**Required Documents:**
+- Income Proof / Salary Slip (Form 16 or Declaration)
+- Residence / Address Proof
+- Citizen Identity ID
+
+**How It Works:** Fast-track verification coordinating Revenue and Identity records.
+👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=income-cert)`;
+  }
+
+  if (msg.includes('trade') || msg.includes('license') || msg.includes('shop')) {
+    return `### Trade License Renewal
+**Department:** Municipal Service
+**Simulated Fee:** ₹250 (Demo Wallet)
+**Required Documents:**
+- Establishment Lease Agreement (.pdf)
+- Safety Declaration / Clearance
+- Prior License ID
+
+**How It Works:** Automatic municipal zoning check and tax status verification.
+👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=trade-license)`;
+  }
+
+  if (msg.includes('property') || msg.includes('tax') || msg.includes('clearance')) {
+    return `### Property Tax Clearance
+**Department:** Tax Service
+**Simulated Fee:** ₹100 (Demo Wallet)
+**Required Documents:**
+- Property Assessment ID
+- Last Property Assessment Receipt
+
+**How It Works:** Automated query to Tax Service and local Revenue records.
+👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=property-tax-clearance)`;
+  }
+
+  if (msg.includes('track') || msg.includes('status') || msg.includes('application id') || msg.includes('js-2026')) {
+    return `### How to Track an Application
+1. Go to the **[Application Tracker](/pages/tracking/)**.
+2. Enter your **Application Tracking ID** (e.g., \`JS-2026-001\`, \`JS-2026-002\`, or \`JS-2026-003\`).
+3. Click **Track Status** to inspect:
+   - Live stage progress (Submission &rarr; Identity &rarr; Revenue &rarr; Tax &rarr; Municipal &rarr; Completion)
+   - Supporting document verification state
+   - Cross-department orchestration logs
+   - Payment status & Demo Wallet receipt`;
+  }
+
+  if (msg.includes('wallet') || msg.includes('pay') || msg.includes('money') || msg.includes('balance') || msg.includes('topup') || msg.includes('top-up') || msg.includes('fee')) {
+    return `### Simulated Digital Wallet / Payment
+Jan-Setu includes a built-in **Demo Digital Wallet** for simulated fee settlements:
+- **Balance & Top-Up:** You start with a sample demo balance (₹1,000) and can top up demo funds anytime.
+- **Pay Fees:** You can settle simulated service application fees directly.
+- **Transaction History:** All simulated credit and debit transactions are recorded with downloadable demo receipts.
+- **Disclaimer:** This is a strictly simulated demo feature and involves **no real money or bank accounts**.
+
+👉 **Access Wallet:** Visit the **[Demo Wallet](/pages/wallet/)** page.`;
+  }
+
+  if (msg.includes('document') || msg.includes('upload') || msg.includes('proof')) {
+    return `### Required Documents Overview
+Depending on your service:
+- **Business Registration:** AddressProof.docx/.pdf, Business Name, Citizen ID.
+- **Income Certificate:** Salary Slip / Form 16 (.pdf), Residence Proof.
+- **Trade License:** Shop Lease Agreement (.pdf), Safety Declaration.
+- **Property Tax Clearance:** Property Assessment ID & Tax Receipt.
+
+You can upload supporting documents during application submission or attach them later on the **[Application Tracker](/pages/tracking/)**.`;
+  }
+
+  if (msg.includes('service') || msg.includes('catalog') || msg.includes('all services')) {
+    return `### Available Jan-Setu Services
+1. **Business Registration (Unified):** Multi-department single-window enterprise clearance.
+2. **Income Certificate Issuance:** Fast revenue-verified income certification.
+3. **Trade License Renewal:** Commercial operating permit clearance.
+4. **Property Tax Clearance:** Municipal property tax assessment and clearance.
+
+👉 **Explore full catalog:** Visit **[Services Catalog](/pages/services/)**.`;
+  }
+
+  if (msg.includes('how does it work') || msg.includes('orchestration') || msg.includes('interoperability') || msg.includes('architecture')) {
+    return `### How Jan-Setu Works (Interoperability & Orchestration)
+1. **Single-Window Request:** The citizen applies once with explicit consent.
+2. **Parallel Orchestration:** Jan-Setu simultaneously contacts Identity, Revenue, Tax, and Municipal adapters.
+3. **Federated Verification:** Departments verify records within their own boundaries without centralizing citizen databases.
+4. **Resilient Offline Handling:** If any department adapter is offline, requests are safely queued and auto-processed upon recovery.
+5. **Transparent Audit Trail:** Every verification query is recorded in the **[Audit Log](/pages/audit/)**.`;
+  }
+
+  return `Jan-Setu is a unified government interoperability and service orchestration platform.
+I can help you with:
+- **Services:** Ask about Business Registration, Income Certificate, Trade License, or Property Tax.
+- **Application:** Guidance on how to apply and required documents.
+- **Tracking:** How to track Application IDs like \`JS-2026-001\`.
+- **Demo Wallet:** How to use the simulated digital wallet for demo fee payments.
+- **Architecture:** How cross-department verification works.
+
+What specific information would you like to know?`;
+}
+
 module.exports = {
   serviceStatuses,
   availableServices,
   auditLogs,
   applications,
+  demoWallet,
+  walletTransactions,
   mockVerifyIdentity,
   mockVerifyAddress,
   mockVerifyTax,
@@ -994,5 +1436,12 @@ module.exports = {
   getDashboardStats,
   getMonitoringData,
   reorchestrateAllQueued,
-  probeDepartmentService
+  probeDepartmentService,
+  getWalletData,
+  topupWallet,
+  payWithWallet,
+  getWalletTransactions,
+  resetWallet,
+  getJanSetuSystemContext,
+  getDeterministicKnowledgeReply
 };

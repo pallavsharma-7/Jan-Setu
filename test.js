@@ -204,10 +204,85 @@ async function runTests() {
     assert(dashRes.body.totalApplications > 0, 'Total applications counted');
     assert(dashRes.body.byStatus !== undefined, 'Status breakdown present');
 
-    // 12. Static Frontend Pages Verification
-    console.log('\n[12/12] Testing Static Frontend Routes...');
+    // 12. POST /api/chat (AI Citizen Assistant)
+    console.log('\n[12/15] Testing Citizen AI Assistant (POST /api/chat)...');
+    // Valid chat message
+    const chatRes = await request('POST', '/api/chat', { message: 'What documents are required for Business Registration?' });
+    assert(chatRes.status === 200, 'POST /api/chat returns 200 for valid query');
+    assert(chatRes.body.success === true, 'Chat response success is true');
+    assert(typeof chatRes.body.reply === 'string' && chatRes.body.reply.length > 0, 'Chat response contains reply text');
+    assert(chatRes.body.source === 'ai' || chatRes.body.source === 'knowledge_base', 'Chat source is valid');
+
+    // Empty chat message rejection
+    const emptyChatRes = await request('POST', '/api/chat', { message: '   ' });
+    assert(emptyChatRes.status === 400, 'Empty chat message rejected with 400');
+    assert(emptyChatRes.body.error !== undefined, 'Error message returned for empty query');
+
+    // 13. Demo Digital Wallet Operations
+    console.log('\n[13/15] Testing Demo Digital Wallet & Simulated Payments...');
+    // GET /api/wallet
+    const walletRes = await request('GET', '/api/wallet');
+    assert(walletRes.status === 200, 'GET /api/wallet returns 200');
+    assert(walletRes.body.success === true, 'Wallet query success is true');
+    assert(typeof walletRes.body.wallet.balance === 'number', 'Wallet balance is a number');
+    assert(walletRes.body.wallet.currency === 'INR', 'Wallet currency is INR');
+    const initialBalance = walletRes.body.wallet.balance;
+
+    // POST /api/wallet/topup (Valid)
+    const topupRes = await request('POST', '/api/wallet/topup', { amount: 500, method: 'Simulated UPI', remarks: 'Test Top-Up' });
+    assert(topupRes.status === 200, 'POST /api/wallet/topup returns 200');
+    assert(topupRes.body.success === true, 'Top-up succeeded');
+    assert(topupRes.body.balance === initialBalance + 500, 'Balance credited accurately (+₹500)');
+    assert(topupRes.body.transaction.type === 'credit', 'Transaction recorded as credit');
+
+    // POST /api/wallet/topup (Invalid / Negative)
+    const badTopupRes = await request('POST', '/api/wallet/topup', { amount: -100 });
+    assert(badTopupRes.status === 400, 'Negative top-up rejected with 400');
+
+    // POST /api/wallet/pay (Valid Fee Settlement)
+    const payRes = await request('POST', '/api/wallet/pay', {
+      applicationId: queuedAppId,
+      amount: 150,
+      purpose: 'Simulated fee for test application'
+    });
+    assert(payRes.status === 200, 'POST /api/wallet/pay returns 200');
+    assert(payRes.body.success === true, 'Payment succeeded');
+    assert(payRes.body.receiptId !== undefined, 'Receipt ID generated');
+    assert(payRes.body.transaction.type === 'debit', 'Transaction recorded as debit');
+
+    // Verify application paymentStatus updated to paid
+    const updatedAppRes = await request('GET', `/api/applications/${queuedAppId}`);
+    assert(updatedAppRes.body.paymentStatus === 'paid', 'Application paymentStatus marked as paid');
+
+    // POST /api/wallet/pay (Insufficient Balance)
+    const excessivePayRes = await request('POST', '/api/wallet/pay', { amount: 999999 });
+    assert(excessivePayRes.status === 400, 'Insufficient balance payment rejected with 400');
+
+    // POST /api/wallet/pay (Invalid Amount)
+    const zeroPayRes = await request('POST', '/api/wallet/pay', { amount: 0 });
+    assert(zeroPayRes.status === 400, 'Zero amount payment rejected with 400');
+
+    // 14. GET /api/wallet/transactions
+    console.log('\n[14/15] Testing Wallet Transaction History...');
+    const txnsRes = await request('GET', '/api/wallet/transactions');
+    assert(txnsRes.status === 200, 'GET /api/wallet/transactions returns 200');
+    assert(Array.isArray(txnsRes.body) && txnsRes.body.length >= 3, 'Transactions list populated');
+
+    // Filter transactions by debit
+    const debitTxnsRes = await request('GET', '/api/wallet/transactions?type=debit');
+    assert(debitTxnsRes.status === 200, 'Filtered transactions returns 200');
+    assert(debitTxnsRes.body.every(t => t.type === 'debit'), 'All filtered items are debits');
+
+    // 15. Static Frontend Pages Verification
+    console.log('\n[15/15] Testing All Static Frontend Routes (including Chatbot & Wallet)...');
     const homePage = await request('GET', '/');
     assert(homePage.status === 200, 'Home page (/) returns 200');
+
+    const chatPage = await request('GET', '/pages/chatbot/');
+    assert(chatPage.status === 200, 'Chatbot page (/pages/chatbot/) returns 200');
+
+    const walletPage = await request('GET', '/pages/wallet/');
+    assert(walletPage.status === 200, 'Demo Wallet page (/pages/wallet/) returns 200');
 
     const monPage = await request('GET', '/pages/monitoring/');
     assert(monPage.status === 200, 'Monitoring page (/pages/monitoring/) returns 200');
@@ -228,7 +303,7 @@ async function runTests() {
     assert(srvPage.status === 200, 'Services page (/pages/services/) returns 200');
 
     console.log('\n====================================================');
-    console.log('  ALL 12 INTEGRATION & MONITORING TEST SUITES PASSED!  ');
+    console.log('  ALL 15 INTEGRATION, AI & WALLET TEST SUITES PASSED!  ');
     console.log('====================================================\n');
   } catch (err) {
     console.error('\n❌ UNEXPECTED ERROR DURING TESTS:', err);

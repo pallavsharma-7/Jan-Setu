@@ -92,10 +92,38 @@ All endpoints are local REST endpoints provided by our Express backend:
 | `/api/monitoring` | `GET` | Retrieve real-time system monitoring metrics & adapter telemetry |
 | `/api/monitoring/reorchestrate` | `POST` | Trigger pipeline re-sync across queued requests |
 | `/api/monitoring/probe/:department` | `POST` | Trigger live diagnostic health probe on a department adapter |
+| `/api/chat` | `POST` | AI Citizen Assistant service guidance and platform FAQ |
+| `/api/wallet` | `GET` | Retrieve Demo Digital Wallet balance and summary |
+| `/api/wallet/topup` | `POST` | Top-up simulated demo funds |
+| `/api/wallet/pay` | `POST` | Settle simulated public service / application fee |
+| `/api/wallet/transactions` | `GET` | List simulated wallet credit & debit transaction history |
+| `/api/wallet/reset` | `POST` | Reset demo wallet state to initial prototype grant |
 
 ---
 
-## 6. Simulated Departmental Services & Normalized Responses
+## 6. AI Citizen Assistant & Environment Configuration
+
+Jan-Setu features a built-in **Citizen AI Assistant** at `/pages/chatbot/` designed specifically for public service discovery, eligibility explanations, document guidance, and navigation assistance.
+
+### Server-Side AI Security & Fallback
+- **Server-Side Execution**: All AI model calls occur strictly on the server backend (`POST /api/chat`). No API keys or credentials are ever sent to or exposed in browser JavaScript.
+- **Environment Variable**: `AI_API_KEY` (or `GEMINI_API_KEY`).
+- **Local Development**: Copy `.env.example` to `.env` and set `AI_API_KEY=your_key_here`. Real `.env` files are ignored by Git.
+- **Production (Render)**: Set the `AI_API_KEY` environment variable in your Render dashboard under the existing **Jan-Setu** service settings.
+- **Resilient Fallback Engine**: If no `AI_API_KEY` is configured or if network access is unavailable, the assistant seamlessly utilizes Jan-Setu's built-in deterministic knowledge base to answer questions about available services, documents, and application tracking with zero server downtime.
+
+---
+
+## 7. Simulated Digital Wallet & Demo Payments
+
+Jan-Setu provides a **Demo Digital Wallet** at `/pages/wallet/` allowing citizens to experience digital fee settlement without real financial risks:
+- **Strictly Simulated**: Does NOT process real money, connect to real banks, or store banking credentials, CVVs, or UPI PINs.
+- **Features**: Real-time balance display, simulated top-ups (+₹100, +₹500, +₹1,000, +₹2,500), simulated application fee payments, and downloadable demo receipts.
+- **In-Memory Storage**: Demo wallet balance and transaction logs are maintained in-memory and reset when the server restarts or via the Reset button.
+
+---
+
+## 8. Simulated Departmental Services & Normalized Responses
 
 1. **Identity Service** (`mockVerifyIdentity`)
    - Normal Response: `{ "name": "Aarav Sharma", "verified": true }`
@@ -110,29 +138,29 @@ All endpoints are local REST endpoints provided by our Express backend:
 
 ---
 
-## 7. Demo Application
+## 9. Demo Application & Testing
 
 - **Demo Application ID**: `JS-2026-001`
 - **Demo Citizen Name**: Aarav Sharma
 - **Service**: Business Registration (Unified)
+- **Automated Verification**: Run `node test.js` or `npm test` to execute all 15 automated integration, AI, and wallet test suites.
 
 ---
 
-## 8. Team Ownership & Branch Workflow
+## 10. Team Ownership & Branch Workflow
 
 | Developer | Feature / Page | Target Branch | Status |
 | :--- | :--- | :--- | :--- |
 | **PALLAV** | Core Architecture, Server, API & Shared Design System | `pallav-core` | COMPLETED |
 | **PATHIKA** | Home Page & Services Catalog | `pathika-home-services` | COMPLETED |
 | **TANISHKA** | Application Submission Form & Workflow | `tanishka-application` | COMPLETED |
-| **PALAK** | Document Upload & Application Tracking UI | `palak-documents-tracking` | COMPLETED |
+| **PALAK** | Documents Tracking, AI Citizen Assistant & Demo Wallet | `palak-ai-wallet` | COMPLETED |
 | **RUCHA** | Department Officer Dashboard & Audit Log Viewer | `rucha-dashboard-audit` | COMPLETED |
 | **PARTH** | Interoperability Health Monitoring & Service Toggles | `parth-monitoring` | COMPLETED |
 
 ---
 
-### Instructions for Team Members Branching from `pallav-core`:
-1. Clone the repository and fetch branch: `git fetch origin`
-2. Create your branch from `pallav-core`: `git checkout -b feature-<yourname> origin/pallav-core`
-3. Use the shared CSS system (`styles.css`) and shared API wrapper (`JanSetuAPI` in `api.js`) for your pages.
-4. Keep the shared files (`server.js`, `routes.js`, `data.js`, `styles.css`) intact to prevent merge conflicts.
+### Render Deployment
+- **Production Branch**: `pallav-core`
+- **Render Service**: `Jan-Setu`
+- **Auto-Deploy**: Enabled — automatically triggers deployment upon push to `pallav-core`.

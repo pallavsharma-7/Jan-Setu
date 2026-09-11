@@ -214,5 +214,193 @@ router.post('/monitoring/probe/:department', (req, res) => {
   }
 });
 
+// -------------------------------------------------------------
+// PALAK - AI CITIZEN ASSISTANT ROUTE (POST /api/chat)
+// -------------------------------------------------------------
+
+async function callAIProvider(userMessage, conversationHistory = []) {
+  const apiKey = process.env.AI_API_KEY || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return {
+      success: true,
+      reply: data.getDeterministicKnowledgeReply(userMessage),
+      source: "knowledge_base"
+    };
+  }
+
+  const systemContext = data.getJanSetuSystemContext();
+
+  const contents = [];
+  if (Array.isArray(conversationHistory)) {
+    conversationHistory.slice(-6).forEach(item => {
+      if (item && item.content && (item.role === 'user' || item.role === 'assistant' || item.role === 'model')) {
+        contents.push({
+          role: item.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: String(item.content) }]
+        });
+      }
+    });
+  }
+  contents.push({
+    role: 'user',
+    parts: [{ text: userMessage }]
+  });
+
+  const payload = {
+    system_instruction: {
+      parts: [{ text: systemContext }]
+    },
+    contents: contents,
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 800
+    }
+  };
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.warn(`[AI Service] Provider responded with HTTP ${response.status}. Falling back to knowledge base.`);
+      return {
+        success: true,
+        reply: data.getDeterministicKnowledgeReply(userMessage),
+        source: "knowledge_base"
+      };
+    }
+
+    const resJson = await response.json();
+    const replyText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!replyText) {
+      return {
+        success: true,
+        reply: data.getDeterministicKnowledgeReply(userMessage),
+        source: "knowledge_base"
+      };
+    }
+
+    return {
+      success: true,
+      reply: replyText.trim(),
+      source: "ai"
+    };
+  } catch (err) {
+    console.warn(`[AI Service] Call failed (${err.message}). Falling back safely to knowledge base.`);
+    return {
+      success: true,
+      reply: data.getDeterministicKnowledgeReply(userMessage),
+      source: "knowledge_base"
+    };
+  }
+}
+
+// 14. POST /api/chat - Citizen AI Assistance endpoint
+router.post('/chat', async (req, res) => {
+  try {
+    const { message, history } = req.body || {};
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return res.status(400).json({ error: "Message is required and cannot be empty." });
+    }
+
+    if (message.length > 2000) {
+      return res.status(400).json({ error: "Message is too long. Maximum allowed length is 2000 characters." });
+    }
+
+    const result = await callAIProvider(message.trim(), history);
+    data.addAuditRecord(
+      "Citizen AI Assistant",
+      "Citizen Inbound Query",
+      "Service Guidance & Platform FAQ",
+      `Resolved (${result.source})`,
+      "CHAT-QUERY"
+    );
+
+    res.json({
+      ...result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("Chat endpoint error:", err);
+    res.status(500).json({
+      error: "Failed to process chat query",
+      reply: "I am temporarily experiencing technical difficulties. Please explore our Services catalog or Application Tracker directly."
+    });
+  }
+});
+
+// -------------------------------------------------------------
+// PALAK - SIMULATED DIGITAL WALLET / PAYMENT ROUTES
+// -------------------------------------------------------------
+
+// 15. GET /api/wallet - Retrieve Demo Digital Wallet state & summary
+router.get('/wallet', (req, res) => {
+  try {
+    const wallet = data.getWalletData();
+    res.json({ success: true, wallet });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch wallet data", message: err.message });
+  }
+});
+
+// 16. POST /api/wallet/topup - Simulated Wallet Top-Up
+router.post('/wallet/topup', (req, res) => {
+  try {
+    const { amount, method, remarks } = req.body || {};
+    const result = data.topupWallet({ amount, method, remarks });
+    if (!result.success) {
+      return res.status(result.status || 400).json(result);
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to top up wallet", message: err.message });
+  }
+});
+
+// 17. POST /api/wallet/pay - Simulated Service Fee Payment
+router.post('/wallet/pay', (req, res) => {
+  try {
+    const { applicationId, serviceId, amount, purpose } = req.body || {};
+    const result = data.payWithWallet({ applicationId, serviceId, amount, purpose });
+    if (!result.success) {
+      return res.status(result.status || 400).json(result);
+    }
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to process simulated payment", message: err.message });
+  }
+});
+
+// 18. GET /api/wallet/transactions - List Wallet Transactions
+router.get('/wallet/transactions', (req, res) => {
+  try {
+    const transactions = data.getWalletTransactions(req.query);
+    res.json(transactions);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch transactions", message: err.message });
+  }
+});
+
+// 19. POST /api/wallet/reset - Reset Demo Wallet state for testing
+router.post('/wallet/reset', (req, res) => {
+  try {
+    const result = data.resetWallet();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to reset wallet", message: err.message });
+  }
+});
+
 module.exports = router;
 

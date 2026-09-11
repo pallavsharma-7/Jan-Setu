@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jan-Setu | Demo Digital Wallet & Simulated Payments</title>
+  <meta name="description" content="Simulated Digital Wallet and demo payment feature for Jan-Setu public service fee settlements.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="wallet.css">
+</head>
+<body>
+
+  <!-- Official Top Accessibility & Government Header Bar -->
+  <header class="gov-header">
+    <div class="gov-top-bar">
+      <div class="gov-top-bar-inner">
+        <div>Government Interoperability Demonstration Prototype</div>
+        <div>Local Mock Simulation Mode &nbsp;|&nbsp; Module: <strong>Demo Digital Wallet (Palak)</strong></div>
+      </div>
+    </div>
+
+    <div class="gov-brand-container">
+      <div class="gov-brand">
+        <img src="/assets/jan-setu-logo.jpg" alt="Jan-Setu Logo" class="gov-emblem-img">
+        <div class="gov-title-group">
+          <h1>JAN-SETU</h1>
+          <div class="gov-subtitle">Unified Service Orchestration Platform</div>
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-online"><span class="status-indicator online"></span>DEMO WALLET ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="gov-nav-bar" aria-label="Main Navigation">
+      <div class="gov-nav-inner">
+        <a href="/" class="gov-nav-link">Home</a>
+        <a href="/pages/services/" class="gov-nav-link">Services</a>
+        <a href="/pages/application/" class="gov-nav-link">Apply</a>
+        <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
+        <a href="/pages/wallet/" class="gov-nav-link active" aria-current="page">Demo Wallet</a>
+        <a href="/pages/chatbot/" class="gov-nav-link">AI Assistant</a>
+        <a href="/pages/dashboard/" class="gov-nav-link">Department Dashboard</a>
+        <a href="/pages/audit/" class="gov-nav-link">Audit Log</a>
+        <a href="/pages/monitoring/" class="gov-nav-link">System Status</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Page Container -->
+  <main class="page-container wallet-page-wrapper">
+
+    <!-- Functional Prototype Disclaimer Banner -->
+    <div class="proto-disclaimer" role="alert">
+      <div>
+        <strong>SIMULATED PAYMENT DEMO:</strong> This feature is a demonstration of digital fee settlement for Jan-Setu unified applications. It does <strong>not process real money, connect to real banking rails, or store credit cards, UPI PINs, or financial credentials</strong>.
+      </div>
+    </div>
+
+    <!-- Top Grid: Balance Card & Top-Up Card -->
+    <div class="wallet-grid">
+
+      <!-- Left: Balance Card -->
+      <div class="balance-card">
+        <div>
+          <div class="balance-card-top">
+            <div>
+              <div class="balance-label">Simulated Citizen Wallet</div>
+              <div class="balance-amount" id="wallet-balance-display">₹1,000.00</div>
+            </div>
+            <span class="badge badge-online"><span class="status-indicator online"></span>DEMO READY</span>
+          </div>
+
+          <div class="balance-holder-info">
+            <div>
+              <span style="display: block; font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Citizen Account</span>
+              <strong id="wallet-holder-name" style="color: #ffffff;">Aarav Sharma</strong>
+            </div>
+            <div style="text-align: right;">
+              <span style="display: block; font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Demo Account ID</span>
+              <strong id="wallet-acc-number" style="font-family: monospace; color: #ffffff;">JS-WAL-8820-2026</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Top-Up Action Bar -->
+        <div class="quick-topup-bar">
+          <div class="quick-topup-title">Quick Demo Top-Up Presets:</div>
+          <div class="quick-topup-pills">
+            <button type="button" class="quick-pill-btn" data-amount="100">+₹100</button>
+            <button type="button" class="quick-pill-btn" data-amount="500">+₹500</button>
+            <button type="button" class="quick-pill-btn" data-amount="1000">+₹1,000</button>
+            <button type="button" class="quick-pill-btn" data-amount="2500">+₹2,500</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Top-Up Form Card -->
+      <div class="payment-box">
+        <div class="payment-box-header flex-between">
+          <h2 style="margin: 0; font-size: 1.15rem; color: var(--color-navy);">Add Demo Funds</h2>
+          <span class="badge badge-online">Instant Top-Up</span>
+        </div>
+
+        <div id="topup-msg-box" style="display: none; margin-bottom: 0.75rem;"></div>
+
+        <form id="wallet-topup-form" novalidate>
+          <div class="form-group">
+            <label for="topup-amount-input" class="form-label">Top-Up Amount (₹) *</label>
+            <input 
+              type="number" 
+              id="topup-amount-input" 
+              class="form-input" 
+              min="1" 
+              max="50000" 
+              step="1" 
+              placeholder="Enter amount (e.g. 500)" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="topup-method-select" class="form-label">Simulated Method *</label>
+            <select id="topup-method-select" class="form-select">
+              <option value="Simulated UPI">Simulated UPI (VPA Demo)</option>
+              <option value="Prototype NetBanking">Prototype NetBanking (Demo Sandbox)</option>
+              <option value="Government Grant Demo">Government Grant Prototype Allocation</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="topup-remarks-input" class="form-label">Remarks / Note (Optional)</label>
+            <input 
+              type="text" 
+              id="topup-remarks-input" 
+              class="form-input" 
+              placeholder="e.g. Balance top-up for trade license fee"
+            >
+          </div>
+
+          <button type="submit" id="btn-topup-submit" class="btn btn-secondary" style="width: 100%;">
+            Top Up Demo Wallet
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Middle Section: Pay Application Fee Section -->
+    <div class="gov-card">
+      <div class="gov-card-header">
+        <h2 class="gov-card-title">Settle Simulated Service Fee</h2>
+        <span class="badge badge-pending">Instant Receipt</span>
+      </div>
+      <div class="gov-card-body">
+        <p style="font-size: 0.88rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+          Select any existing unified application to settle its statutory processing fee using your demo wallet balance. Upon payment, the application's timeline and audit records are updated automatically.
+        </p>
+
+        <div id="pay-msg-box" style="display: none; margin-bottom: 1rem;"></div>
+
+        <form id="wallet-pay-form" novalidate>
+          <div class="grid grid-2 gap-2">
+            <div class="form-group">
+              <label for="pay-application-select" class="form-label">Select Application *</label>
+              <select id="pay-application-select" class="form-select" required>
+                <option value="">Loading applications...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="pay-amount-input" class="form-label">Simulated Fee Amount (₹) *</label>
+              <input 
+                type="number" 
+                id="pay-amount-input" 
+                class="form-input" 
+                min="1" 
+                placeholder="Fee auto-populates upon selection" 
+                required
+              >
+            </div>
+          </div>
+
+          <div id="pay-app-status-note" style="display: none; margin-bottom: 1rem;"></div>
+
+          <div class="form-group">
+            <label for="pay-purpose-input" class="form-label">Payment Purpose (Optional)</label>
+            <input 
+              type="text" 
+              id="pay-purpose-input" 
+              class="form-input" 
+              placeholder="e.g. Expedited unified single-window processing fee"
+            >
+          </div>
+
+          <div class="flex-between">
+            <button type="submit" id="btn-wallet-pay" class="btn btn-primary">
+              Pay Simulated Fee
+            </button>
+            <a href="/pages/tracking/" class="btn btn-outline btn-sm">
+              Track Application &rarr;
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Transaction History Table -->
+    <div class="gov-card">
+      <div class="gov-card-header flex-between flex-wrap gap-1">
+        <div>
+          <h2 class="gov-card-title">Simulated Transaction History</h2>
+        </div>
+        <div class="flex gap-1 flex-wrap">
+          <label for="txn-filter-type" class="sr-only">Filter Type</label>
+          <select id="txn-filter-type" class="form-select" style="width: auto; font-size: 0.82rem; padding: 0.35rem 0.65rem;">
+            <option value="all">All Types</option>
+            <option value="credit">Credits (Top-Ups)</option>
+            <option value="debit">Debits (Fee Payments)</option>
+          </select>
+
+          <label for="txn-search-input" class="sr-only">Search</label>
+          <input 
+            type="text" 
+            id="txn-search-input" 
+            class="form-input" 
+            placeholder="Search Txn ID / Reference..." 
+            style="width: 220px; font-size: 0.82rem; padding: 0.35rem 0.65rem;"
+          >
+
+          <button type="button" id="btn-reset-wallet" class="btn btn-outline btn-sm" title="Reset Demo Wallet Balance">
+            Reset Demo
+          </button>
+        </div>
+      </div>
+
+      <div class="gov-card-body" style="padding: 0;">
+        <div class="gov-table-container" style="border: none; border-radius: 0;">
+          <table class="gov-table" id="transactions-table">
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Timestamp</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Reference ID</th>
+                <th style="text-align: right;">Amount</th>
+                <th style="text-align: center;">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-tbody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Official Shared Footer Structure -->
+  <footer class="gov-footer">
+    <div class="gov-footer-inner">
+      <div class="gov-footer-brand">
+        <h3>JAN-SETU</h3>
+        <p style="color: #94a3b8; font-size: 0.83rem; line-height: 1.5;">
+          Unified Interoperability & Service Orchestration Platform prototype for seamless citizen governance.
+          Demonstrating federated data exchange and automated verification workflows.
+        </p>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Portal Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pages/services/">Services Catalog</a></li>
+          <li><a href="/pages/application/">Application Submission</a></li>
+          <li><a href="/pages/tracking/">Application Tracker</a></li>
+          <li><a href="/pages/wallet/">Demo Wallet</a></li>
+          <li><a href="/pages/chatbot/">AI Assistant</a></li>
+          <li><a href="/pages/dashboard/">Department Dashboard</a></li>
+          <li><a href="/pages/audit/">Audit Log</a></li>
+        </ul>
+      </div>
+      <div class="gov-footer-links">
+        <h4>Simulated Services</h4>
+        <ul>
+          <li>Identity Service (Online)</li>
+          <li>Revenue Service (Online)</li>
+          <li>Tax Service (Online)</li>
+          <li>Municipal Service (Online)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      Jan-Setu Functional Prototype &copy; 2026. Built on core foundation branch <strong>pallav-core</strong>. Module: Demo Digital Wallet (Palak).
+    </div>
+  </footer>
+
+  <!-- Core JavaScript Libraries -->
+  <script src="/js/api.js"></script>
+  <script src="/js/shared.js"></script>
+  <script src="wallet.js"></script>
+</body>
+</html>

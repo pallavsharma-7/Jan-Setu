@@ -644,6 +644,13 @@ function displayConfirmation(app) {
   // Update tracking link
   linkTrackApp.href =
     `/pages/tracking/?id=${encodeURIComponent(app.id)}`;
+
+  // Update Demo Wallet fee settlement link (Palak)
+  const linkPayWallet = document.getElementById('link-pay-wallet-app');
+  if (linkPayWallet && app.id) {
+    const fee = app.feeAmount || 150;
+    linkPayWallet.href = `/pages/wallet/?appId=${encodeURIComponent(app.id)}&amount=${encodeURIComponent(fee)}`;
+  }
 }
 
   /**

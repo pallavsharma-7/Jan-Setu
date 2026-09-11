@@ -1,0 +1,215 @@
+﻿/* ==========================================================================
+   Jan-Setu Demo Wallet & Simulated Payment - Stylesheet
+   Follows Official Jan-Setu Design Tokens & Layout Architecture
+   ========================================================================== */
+
+.wallet-page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wallet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .wallet-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Balance Hero Card */
+.balance-card {
+  background: linear-gradient(135deg, var(--color-navy-dark) 0%, var(--color-navy) 100%);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border-left: 5px solid var(--color-saffron);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.balance-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.balance-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.balance-amount {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0.3rem 0;
+  letter-spacing: -0.5px;
+}
+
+.balance-holder-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.quick-topup-bar {
+  margin-top: 1rem;
+}
+
+.quick-topup-title {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.quick-topup-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.quick-pill-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-pill-btn:hover {
+  background: var(--color-saffron);
+  color: #ffffff;
+  border-color: var(--color-saffron);
+}
+
+/* Pay Form Card */
+.payment-box {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.payment-box-header {
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+/* Transaction Badges */
+.txn-badge-credit {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.txn-badge-debit {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-border);
+}
+
+.txn-amount-credit {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.txn-amount-debit {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* Modal for Receipts */
+.receipt-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 25, 47, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.receipt-modal {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--color-navy);
+  overflow: hidden;
+  animation: modalPop 0.2s ease-out;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.receipt-header {
+  background-color: var(--color-navy);
+  color: #ffffff;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--color-saffron);
+}
+
+.receipt-body {
+  padding: 1.25rem;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--color-border-light);
+  font-size: 0.88rem;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin-top: 0.5rem;
+  border-top: 2px solid var(--color-border);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--color-navy);
+}
+
+.receipt-footer {
+  background-color: var(--color-surface-alt);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-border-light);
+}

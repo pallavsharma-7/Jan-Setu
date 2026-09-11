@@ -322,6 +322,109 @@ const JanSetuAPI = {
       console.error('API Error (probeDepartment):', err);
       return { success: false, error: err.message };
     }
+  },
+
+  /**
+   * 17. Send Message to Citizen AI Assistant
+   */
+  async sendChatMessage(message, history = []) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history })
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (sendChatMessage):', err);
+      return {
+        success: false,
+        error: err.message,
+        reply: 'Unable to connect to Jan-Setu AI Service. Please try again or check the Services catalog directly.'
+      };
+    }
+  },
+
+  /**
+   * 18. Retrieve Demo Wallet summary & balance
+   */
+  async getWallet() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/wallet`);
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (getWallet):', err);
+      return { success: false, error: err.message, wallet: { balance: 0, currency: 'INR' } };
+    }
+  },
+
+  /**
+   * 19. Simulated Wallet Top-Up
+   */
+  async topupWallet(topupData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/wallet/topup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(topupData)
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (topupWallet):', err);
+      return { success: false, error: err.message };
+    }
+  },
+
+  /**
+   * 20. Settle Simulated Application Fee
+   */
+  async payWallet(paymentData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/wallet/pay`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData)
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (payWallet):', err);
+      return { success: false, error: err.message };
+    }
+  },
+
+  /**
+   * 21. Get Wallet Transactions
+   */
+  async getWalletTransactions(params = {}) {
+    try {
+      const query = new URLSearchParams();
+      if (params.type && params.type !== 'all') query.set('type', params.type);
+      if (params.search) query.set('search', params.search);
+
+      const qs = query.toString();
+      const url = qs ? `${API_BASE_URL}/wallet/transactions?${qs}` : `${API_BASE_URL}/wallet/transactions`;
+      const response = await fetch(url);
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (getWalletTransactions):', err);
+      return [];
+    }
+  },
+
+  /**
+   * 22. Reset Demo Wallet
+   */
+  async resetWallet() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/wallet/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return await response.json();
+    } catch (err) {
+      console.error('API Error (resetWallet):', err);
+      return { success: false, error: err.message };
+    }
   }
 };
 

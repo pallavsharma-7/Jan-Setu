@@ -153,6 +153,15 @@ const JanSetuUI = {
     } catch (e) {
       return isoString;
     }
+  },
+
+  /**
+   * Helper to format INR Currency amounts
+   */
+  formatCurrency(amount) {
+    const num = Number(amount);
+    if (isNaN(num)) return '₹0.00';
+    return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 };
 
