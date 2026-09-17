@@ -206,20 +206,52 @@ async function runTests() {
 
     // 12. POST /api/chat (AI Citizen Assistant)
     console.log('\n[12/15] Testing Citizen AI Assistant (POST /api/chat)...');
-    // Valid chat message
-    const chatRes = await request('POST', '/api/chat', { message: 'What documents are required for Business Registration?' });
-    assert(chatRes.status === 200, 'POST /api/chat returns 200 for valid query');
-    assert(chatRes.body.success === true, 'Chat response success is true');
-    assert(typeof chatRes.body.reply === 'string' && chatRes.body.reply.length > 0, 'Chat response contains reply text');
-    assert(chatRes.body.source === 'ai' || chatRes.body.source === 'knowledge_base', 'Chat source is valid');
+
+    // Query 1: Business Registration Documents
+    const chatRes1 = await request('POST', '/api/chat', { message: 'What documents are required for Business Registration?' });
+    assert(chatRes1.status === 200, 'POST /api/chat returns 200 for Business Registration query');
+    assert(chatRes1.body.success === true, 'Chat response success is true');
+    assert(typeof chatRes1.body.reply === 'string' && chatRes1.body.reply.length > 0, 'Chat response contains reply text');
+    assert(chatRes1.body.source === 'ai' || chatRes1.body.source === 'knowledge-base', 'Chat source is "ai" or "knowledge-base"');
+
+    // Query 2: How to apply
+    const chatRes2 = await request('POST', '/api/chat', { message: 'How do I apply for a service?' });
+    assert(chatRes2.status === 200, 'POST /api/chat returns 200 for apply query');
+    assert(chatRes2.body.reply.includes('/pages/application/') || chatRes2.body.reply.toLowerCase().includes('apply'), 'Reply guides citizen to application');
+
+    // Query 3: Tracking
+    const chatRes3 = await request('POST', '/api/chat', { message: 'How can I track my application?' });
+    assert(chatRes3.status === 200, 'POST /api/chat returns 200 for tracking query');
+    assert(chatRes3.body.reply.includes('/pages/tracking/') || chatRes3.body.reply.toLowerCase().includes('track'), 'Reply guides citizen to tracker');
+
+    // Query 4: Simulated Wallet
+    const chatRes4 = await request('POST', '/api/chat', { message: 'What is the simulated wallet?' });
+    assert(chatRes4.status === 200, 'POST /api/chat returns 200 for wallet query');
+    assert(chatRes4.body.reply.toLowerCase().includes('wallet'), 'Reply explains citizen wallet');
+
+    // Query 5: Follow-up question with conversation history
+    const chatRes5 = await request('POST', '/api/chat', {
+      message: 'How do I submit them?',
+      history: [
+        { role: 'user', content: 'What documents are required for Business Registration?' },
+        { role: 'assistant', content: chatRes1.body.reply }
+      ]
+    });
+    assert(chatRes5.status === 200, 'POST /api/chat handles conversation history smoothly');
+    assert(chatRes5.body.success === true, 'Follow-up query succeeded');
 
     // Empty chat message rejection
     const emptyChatRes = await request('POST', '/api/chat', { message: '   ' });
     assert(emptyChatRes.status === 400, 'Empty chat message rejected with 400');
     assert(emptyChatRes.body.error !== undefined, 'Error message returned for empty query');
 
+    // Oversized chat message rejection (> 2000 chars)
+    const longMsg = 'a'.repeat(2005);
+    const longChatRes = await request('POST', '/api/chat', { message: longMsg });
+    assert(longChatRes.status === 400, 'Oversized chat message rejected with 400');
+
     // 13. Demo Digital Wallet Operations
-    console.log('\n[13/15] Testing Demo Digital Wallet & Simulated Payments...');
+    console.log('\n[13/15] Testing Simulated Citizen Wallet & Fee Payments...');
     // GET /api/wallet
     const walletRes = await request('GET', '/api/wallet');
     assert(walletRes.status === 200, 'GET /api/wallet returns 200');
@@ -273,6 +305,12 @@ async function runTests() {
     assert(debitTxnsRes.status === 200, 'Filtered transactions returns 200');
     assert(debitTxnsRes.body.every(t => t.type === 'debit'), 'All filtered items are debits');
 
+    // POST /api/wallet/reset
+    const resetRes = await request('POST', '/api/wallet/reset');
+    assert(resetRes.status === 200, 'POST /api/wallet/reset returns 200');
+    assert(resetRes.body.success === true, 'Wallet reset succeeded');
+    assert(resetRes.body.balance === 1000.00, 'Wallet reset to initial ₹1,000 demo balance');
+
     // 15. Static Frontend Pages Verification
     console.log('\n[15/15] Testing All Static Frontend Routes (including Chatbot & Wallet)...');
     const homePage = await request('GET', '/');
@@ -282,7 +320,7 @@ async function runTests() {
     assert(chatPage.status === 200, 'Chatbot page (/pages/chatbot/) returns 200');
 
     const walletPage = await request('GET', '/pages/wallet/');
-    assert(walletPage.status === 200, 'Demo Wallet page (/pages/wallet/) returns 200');
+    assert(walletPage.status === 200, 'Citizen Wallet page (/pages/wallet/) returns 200');
 
     const monPage = await request('GET', '/pages/monitoring/');
     assert(monPage.status === 200, 'Monitoring page (/pages/monitoring/) returns 200');

@@ -1,5 +1,5 @@
-﻿/**
- * Jan-Setu Demo Wallet & Simulated Payment - Frontend Logic
+/**
+ * Jan-Setu Citizen Wallet & Simulated Payment - Frontend Logic
  * Implements balance management, top-up, application fee settlement, and transaction log.
  */
 
@@ -114,10 +114,10 @@ async function loadApplicationsForPayment() {
       const isPaid = app.paymentStatus === 'paid';
       const opt = document.createElement('option');
       opt.value = app.id;
-      opt.textContent = ${app.id} -  () ;
+      opt.textContent = `${app.id} - ${app.service || 'Service'} (${isPaid ? 'PAID' : `₹${fee}`})`;
       opt.setAttribute('data-fee', fee);
       opt.setAttribute('data-paid', isPaid ? 'true' : 'false');
-      opt.setAttribute('data-service', app.service);
+      opt.setAttribute('data-service', app.service || '');
       select.appendChild(opt);
     });
   } catch (err) {
@@ -149,11 +149,11 @@ function handleAppSelectionChange() {
   if (statusNote) {
     if (isPaid) {
       statusNote.className = 'alert alert-info';
-      statusNote.innerHTML = <strong>Note:</strong> Fee for this application has already been paid in demo session. You may re-pay or test another.;
+      statusNote.innerHTML = '<strong>Note:</strong> Fee for this application has already been paid in demo session. You may re-pay or test another.';
       statusNote.style.display = 'block';
     } else {
       statusNote.className = 'alert alert-warning';
-      statusNote.innerHTML = <strong>Pending Fee:</strong> Statutory fee of  is due for unified processing.;
+      statusNote.innerHTML = `<strong>Pending Fee:</strong> Statutory fee of ₹${fee} is due for unified processing.`;
       statusNote.style.display = 'block';
     }
   }
@@ -187,8 +187,8 @@ async function handleTopupSubmit(e) {
   const btnSubmit = document.getElementById('btn-topup-submit');
 
   const amount = parseFloat(amountInput.value);
-  const method = methodSelect.value;
-  const remarks = remarksInput.value.trim() || 'Simulated Wallet Top-Up';
+  const method = methodSelect ? methodSelect.value : 'Simulated UPI';
+  const remarks = remarksInput ? (remarksInput.value.trim() || 'Simulated Citizen Top-Up') : 'Simulated Top-Up';
 
   if (isNaN(amount) || amount <= 0) {
     showFeedback(msgBox, 'danger', 'Please enter a valid top-up amount greater than ₹0.');
@@ -196,14 +196,14 @@ async function handleTopupSubmit(e) {
   }
 
   btnSubmit.disabled = true;
-  btnSubmit.innerHTML = <span class="loading-spinner"></span> Crediting...;
+  btnSubmit.innerHTML = '<span class="loading-spinner"></span> Crediting...';
 
   try {
     const res = await JanSetuAPI.topupWallet({ amount, method, remarks });
     if (res && res.success) {
-      showFeedback(msgBox, 'success', Successfully credited  to Demo Wallet!);
+      showFeedback(msgBox, 'success', `Successfully credited ₹${amount.toFixed(2)} to Simulated Citizen Wallet!`);
       amountInput.value = '';
-      remarksInput.value = '';
+      if (remarksInput) remarksInput.value = '';
       await loadWalletData();
       await loadTransactions();
     } else {
@@ -213,7 +213,7 @@ async function handleTopupSubmit(e) {
     showFeedback(msgBox, 'danger', 'Network error during top-up.');
   } finally {
     btnSubmit.disabled = false;
-    btnSubmit.innerHTML = Top Up Demo Wallet;
+    btnSubmit.innerHTML = 'Top Up Wallet';
   }
 }
 
@@ -225,9 +225,9 @@ async function handlePaySubmit(e) {
   const msgBox = document.getElementById('pay-msg-box');
   const btnPay = document.getElementById('btn-wallet-pay');
 
-  const appId = select.value;
+  const appId = select ? select.value : '';
   const amount = parseFloat(feeInput.value);
-  const purpose = purposeInput.value.trim();
+  const purpose = purposeInput ? purposeInput.value.trim() : '';
 
   if (isNaN(amount) || amount <= 0) {
     showFeedback(msgBox, 'danger', 'Please enter a valid fee amount greater than ₹0.');
@@ -238,23 +238,23 @@ async function handlePaySubmit(e) {
     showFeedback(
       msgBox,
       'danger',
-      Insufficient Demo Balance (). Please top up at least .
+      `Insufficient Demo Balance (Current: ₹${currentWalletData.balance.toFixed(2)}). Please top up at least ₹${(amount - currentWalletData.balance).toFixed(2)}.`
     );
     return;
   }
 
   btnPay.disabled = true;
-  btnPay.innerHTML = <span class="loading-spinner"></span> Settling Fee...;
+  btnPay.innerHTML = '<span class="loading-spinner"></span> Settling Fee...';
 
   try {
     const res = await JanSetuAPI.payWallet({
       applicationId: appId || null,
       amount,
-      purpose: purpose || (appId ? Simulated fee settlement for  : 'Simulated Public Service Fee')
+      purpose: purpose || (appId ? `Simulated fee settlement for ${appId}` : 'Simulated Public Service Fee')
     });
 
     if (res && res.success) {
-      showFeedback(msgBox, 'success', Payment of  settled successfully! Receipt ID: <strong></strong>);
+      showFeedback(msgBox, 'success', `Payment of ₹${amount.toFixed(2)} settled successfully! Receipt ID: <strong>${res.receiptId || ''}</strong>`);
       await loadWalletData();
       await loadApplicationsForPayment();
       await loadTransactions();
@@ -270,7 +270,7 @@ async function handlePaySubmit(e) {
     showFeedback(msgBox, 'danger', 'Network error during simulated payment.');
   } finally {
     btnPay.disabled = false;
-    btnPay.innerHTML = Pay Simulated Fee;
+    btnPay.innerHTML = 'Pay Simulated Fee';
   }
 }
 
@@ -281,14 +281,14 @@ async function loadTransactions() {
 
   if (!tbody) return;
 
-  tbody.innerHTML = <tr><td colspan="7" style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div> Loading transactions...</td></tr>;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div> Loading transactions...</td></tr>';
 
   try {
     const list = await JanSetuAPI.getWalletTransactions({ type: filterType, search });
     allTransactions = list || [];
 
     if (allTransactions.length === 0) {
-      tbody.innerHTML = <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">No simulated transactions found.</td></tr>;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">No simulated transactions found.</td></tr>';
       return;
     }
 
@@ -298,23 +298,23 @@ async function loadTransactions() {
       const amountClass = isCredit ? 'txn-amount-credit' : 'txn-amount-debit';
       const amountSign = isCredit ? '+' : '-';
 
-      return 
+      return `
         <tr>
-          <td><strong style="font-family: monospace; font-size: 0.85rem;"></strong></td>
-          <td style="font-size: 0.82rem; color: var(--color-text-muted);"></td>
-          <td><span class="badge "></span></td>
-          <td></td>
-          <td><span style="font-family: monospace; font-size: 0.8rem; color: var(--color-teal);"></span></td>
-          <td class="" style="text-align: right;"></td>
+          <td><strong style="font-family: monospace; font-size: 0.85rem;">${JanSetuUI.escapeHtml(txn.id)}</strong></td>
+          <td style="font-size: 0.82rem; color: var(--color-text-muted);">${JanSetuUI.formatDate(txn.timestamp)}</td>
+          <td><span class="badge ${badgeClass}">${txn.type.toUpperCase()}</span></td>
+          <td>${JanSetuUI.escapeHtml(txn.description)}</td>
+          <td><span style="font-family: monospace; font-size: 0.8rem; color: var(--color-teal);">${JanSetuUI.escapeHtml(txn.referenceId || txn.receiptId || '-')}</span></td>
+          <td class="${amountClass}" style="text-align: right;">${amountSign}${JanSetuUI.formatCurrency(txn.amount)}</td>
           <td style="text-align: center;">
-            <button type="button" class="btn btn-outline btn-sm" onclick='viewReceiptById("")'>Receipt</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="viewReceiptById('${JanSetuUI.escapeHtml(txn.id)}')">Receipt</button>
           </td>
         </tr>
-      ;
+      `;
     }).join('');
   } catch (err) {
     console.error('Failed to load transactions:', err);
-    tbody.innerHTML = <tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load transaction history.</td></tr>;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 1.5rem;">Failed to load transaction history.</td></tr>';
   }
 }
 
@@ -326,13 +326,16 @@ function viewReceiptById(txnId) {
 }
 
 function showReceiptModal(txn) {
+  // Remove existing modal if any
+  closeReceiptModal();
+
   const backdrop = document.createElement('div');
   backdrop.className = 'receipt-modal-backdrop';
   backdrop.id = 'receipt-modal-container';
 
   const isCredit = txn.type === 'credit';
 
-  backdrop.innerHTML = 
+  backdrop.innerHTML = `
     <div class="receipt-modal" role="dialog" aria-labelledby="receipt-title">
       <div class="receipt-header">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -348,11 +351,11 @@ function showReceiptModal(txn) {
 
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Receipt No:</span>
-          <strong></strong>
+          <strong>${JanSetuUI.escapeHtml(txn.receiptId || txn.id)}</strong>
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Date & Time:</span>
-          <span></span>
+          <span>${JanSetuUI.formatDate(txn.timestamp)}</span>
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Payer / Citizen:</span>
@@ -360,24 +363,24 @@ function showReceiptModal(txn) {
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Transaction Type:</span>
-          <span class="badge "></span>
+          <span class="badge ${isCredit ? 'txn-badge-credit' : 'txn-badge-debit'}">${txn.type.toUpperCase()}</span>
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Purpose / Description:</span>
-          <span></span>
+          <span>${JanSetuUI.escapeHtml(txn.description)}</span>
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Reference / App ID:</span>
-          <span style="font-family: monospace;"></span>
+          <span style="font-family: monospace;">${JanSetuUI.escapeHtml(txn.referenceId || '-')}</span>
         </div>
         <div class="receipt-row">
           <span style="color: var(--color-text-muted);">Payment Method:</span>
-          <span></span>
+          <span>${JanSetuUI.escapeHtml(txn.method || 'Simulated Digital Payment')}</span>
         </div>
 
         <div class="receipt-total-row">
           <span>Amount Settled:</span>
-          <span></span>
+          <span>${JanSetuUI.formatCurrency(txn.amount)}</span>
         </div>
 
         <div style="background: var(--color-warning-bg); border: 1px solid var(--color-warning-border); padding: 0.5rem; border-radius: var(--radius-sm); font-size: 0.72rem; color: var(--color-warning); margin-top: 0.85rem; text-align: center;">
@@ -385,11 +388,11 @@ function showReceiptModal(txn) {
         </div>
       </div>
       <div class="receipt-footer">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="copyReceiptDetails('')">Copy Receipt</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="copyReceiptDetails('${JanSetuUI.escapeHtml(txn.id)}')">Copy Receipt</button>
         <button type="button" class="btn btn-primary btn-sm" onclick="closeReceiptModal()">Close</button>
       </div>
     </div>
-  ;
+  `;
 
   document.body.appendChild(backdrop);
 }
@@ -403,21 +406,21 @@ function copyReceiptDetails(txnId) {
   const txn = allTransactions.find(t => t.id === txnId);
   if (!txn) return;
 
-  const text = JAN-SETU DEMO PAYMENT RECEIPT\nReceipt No: \nDate: \nAmount: \nDescription: \nRef ID: \nStatus: Completed (Demo);
+  const text = `JAN-SETU DEMO PAYMENT RECEIPT\nReceipt No: ${txn.receiptId || txn.id}\nDate: ${txn.timestamp}\nAmount: ₹${txn.amount.toFixed(2)}\nDescription: ${txn.description}\nRef ID: ${txn.referenceId || '-'}\nStatus: Completed (Simulated Demo)`;
   JanSetuUI.copyToClipboard(text).then(() => {
     alert('Receipt details copied to clipboard!');
   });
 }
 
 async function handleResetWallet() {
-  if (!confirm('Are you sure you want to reset the Demo Wallet to its initial prototype state (₹1,000 balance)?')) {
+  if (!confirm('Are you sure you want to reset the Simulated Wallet to its initial prototype state (₹1,000 balance)?')) {
     return;
   }
 
   try {
     const res = await JanSetuAPI.resetWallet();
     if (res && res.success) {
-      alert('Demo Wallet successfully reset.');
+      alert('Simulated Wallet successfully reset.');
       await loadWalletData();
       await loadTransactions();
       await loadApplicationsForPayment();
@@ -429,7 +432,7 @@ async function handleResetWallet() {
 
 function showFeedback(container, type, html) {
   if (!container) return;
-  container.className = lert alert-;
+  container.className = `alert alert-${type}`;
   container.innerHTML = html;
   container.style.display = 'block';
   setTimeout(() => {

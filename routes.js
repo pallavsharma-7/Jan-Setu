@@ -215,36 +215,62 @@ router.post('/monitoring/probe/:department', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// PALAK - AI CITIZEN ASSISTANT ROUTE (POST /api/chat)
+// AI CITIZEN ASSISTANT ROUTE (POST /api/chat)
 // -------------------------------------------------------------
 
 async function callAIProvider(userMessage, conversationHistory = []) {
-  const apiKey = process.env.AI_API_KEY || process.env.GEMINI_API_KEY;
+  const apiKey = (process.env.AI_API_KEY || process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
     return {
       success: true,
       reply: data.getDeterministicKnowledgeReply(userMessage),
-      source: "knowledge_base"
+      source: "knowledge-base"
     };
   }
 
   const systemContext = data.getJanSetuSystemContext();
 
+  // Sanitize and structure conversation history strictly alternating user/model
   const contents = [];
   if (Array.isArray(conversationHistory)) {
-    conversationHistory.slice(-6).forEach(item => {
-      if (item && item.content && (item.role === 'user' || item.role === 'assistant' || item.role === 'model')) {
+    const rawHistory = conversationHistory.slice(-10);
+    for (const item of rawHistory) {
+      if (!item || !item.content) continue;
+      const role = (item.role === 'assistant' || item.role === 'model') ? 'model' : 'user';
+      const text = String(item.content).trim();
+      if (!text) continue;
+
+      // Avoid consecutive turns with identical roles
+      if (contents.length > 0 && contents[contents.length - 1].role === role) {
+        contents[contents.length - 1].parts[0].text += `\n${text}`;
+      } else {
         contents.push({
-          role: item.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: String(item.content) }]
+          role: role,
+          parts: [{ text }]
         });
       }
+    }
+  }
+
+  // Ensure current user message is appended cleanly without duplicate user turn
+  if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+    // If the last history turn is already the exact userMessage, we don't append duplicate
+    if (contents[contents.length - 1].parts[0].text !== userMessage) {
+      contents.push({
+        role: 'model',
+        parts: [{ text: "Understood. How can I assist you further?" }]
+      });
+      contents.push({
+        role: 'user',
+        parts: [{ text: userMessage }]
+      });
+    }
+  } else {
+    contents.push({
+      role: 'user',
+      parts: [{ text: userMessage }]
     });
   }
-  contents.push({
-    role: 'user',
-    parts: [{ text: userMessage }]
-  });
 
   const payload = {
     system_instruction: {
@@ -252,58 +278,57 @@ async function callAIProvider(userMessage, conversationHistory = []) {
     },
     contents: contents,
     generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 800
+      temperature: 0.3,
+      maxOutputTokens: 1000
     }
   };
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+  const modelsToTry = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-2.5-flash'
+  ];
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-    clearTimeout(timeoutId);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
 
-    if (!response.ok) {
-      console.warn(`[AI Service] Provider responded with HTTP ${response.status}. Falling back to knowledge base.`);
-      return {
-        success: true,
-        reply: data.getDeterministicKnowledgeReply(userMessage),
-        source: "knowledge_base"
-      };
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const resJson = await response.json();
+        const replyText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (replyText && replyText.trim()) {
+          return {
+            success: true,
+            reply: replyText.trim(),
+            source: "ai"
+          };
+        }
+      } else {
+        console.warn(`[AI Service] Model ${model} returned HTTP ${response.status}.`);
+      }
+    } catch (err) {
+      console.warn(`[AI Service] Model ${model} request failed (${err.message}).`);
     }
-
-    const resJson = await response.json();
-    const replyText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!replyText) {
-      return {
-        success: true,
-        reply: data.getDeterministicKnowledgeReply(userMessage),
-        source: "knowledge_base"
-      };
-    }
-
-    return {
-      success: true,
-      reply: replyText.trim(),
-      source: "ai"
-    };
-  } catch (err) {
-    console.warn(`[AI Service] Call failed (${err.message}). Falling back safely to knowledge base.`);
-    return {
-      success: true,
-      reply: data.getDeterministicKnowledgeReply(userMessage),
-      source: "knowledge_base"
-    };
   }
+
+  // Safe fallback to internal knowledge base if API or models fail
+  console.info('[AI Service] Provider unavailable or request failed. Engaging deterministic knowledge engine.');
+  return {
+    success: true,
+    reply: data.getDeterministicKnowledgeReply(userMessage),
+    source: "knowledge-base"
+  };
 }
 
 // 14. POST /api/chat - Citizen AI Assistance endpoint
@@ -328,7 +353,9 @@ router.post('/chat', async (req, res) => {
     );
 
     res.json({
-      ...result,
+      success: true,
+      reply: result.reply,
+      source: result.source,
       timestamp: new Date().toISOString()
     });
   } catch (err) {

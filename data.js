@@ -1254,9 +1254,13 @@ function resetWallet() {
 // PALAK - AI CITIZEN ASSISTANT KNOWLEDGE CONTEXT & ENGINE
 // -------------------------------------------------------------
 
+// -------------------------------------------------------------
+// AI CITIZEN ASSISTANT KNOWLEDGE CONTEXT & ENGINE
+// -------------------------------------------------------------
+
 function getJanSetuSystemContext() {
   const serviceListText = availableServices.map(s =>
-    `- ${s.name} (ID: ${s.id}, Department: ${s.department}): ${s.description}. Required Documents: ${s.requiredDocs ? s.requiredDocs.join(', ') : 'Standard proofs'}. Fee: ${s.feeDisplay || '₹150 (Demo)'}.`
+    `- ${s.name} (ID: ${s.id}, Department: ${s.department}): ${s.description}. Required Documents: ${s.requiredDocs ? s.requiredDocs.join(', ') : 'Standard proofs'}. Fee: ${s.feeDisplay || '₹150 (Simulated Demo)'}.`
   ).join('\n');
 
   return `You are Jan-Setu AI Assistant, the official citizen guidance helper for the Jan-Setu Unified Interoperability & Service Orchestration Platform.
@@ -1275,17 +1279,18 @@ KEY PLATFORM SECTIONS & HOW TO USE:
 - Apply for Services: Go to /pages/application/ to submit a unified application with citizen consent.
 - Track Application: Go to /pages/tracking/ and enter the Application ID (e.g., JS-2026-001) to view real-time stage progress, document status, and department logs.
 - Services Catalog: Go to /pages/services/ to explore all available services, eligibility, and participating adapters.
-- Demo Digital Wallet: Go to /pages/wallet/ to view simulated balance, top up demo funds, and settle application fees.
+- Simulated Citizen Wallet: Accessible via the Wallet icon in the top navigation or at /pages/wallet/ to view simulated balance, top up demo funds, and settle application fees.
 - Department Dashboard: Go to /pages/dashboard/ for operational metrics and service performance.
 - Audit Log: Go to /pages/audit/ for immutable records of every cross-department verification query.
 - System Status: Go to /pages/monitoring/ for live adapter telemetry, uptime, and latency.
 
 RULES & BOUNDARIES:
-1. Provide concise, clear, polite, and well-structured answers using markdown bullet points.
-2. Clearly explain how to use the portal, what documents are required, and how orchestration works.
-3. State that Jan-Setu is an interoperability demonstration platform and does not connect to real citizen records.
-4. Never make fabricated legal guarantees or claim official authority.
-5. If the user asks about payment or wallet, guide them to the Demo Wallet at /pages/wallet/.`;
+1. Provide concise, clear, polite, and well-structured answers using clean markdown formatting (bullet points, bold text).
+2. Clearly explain how to use the portal, what documents are required, and how orchestration works based strictly on Jan-Setu data.
+3. State that Jan-Setu is an interoperability demonstration platform and does not connect to real citizen records or live production government infrastructure.
+4. Never invent government fees, application statuses, application IDs, or official policies not present in project data.
+5. If the user asks about payments or fee settlement, guide them to the simulated Wallet at /pages/wallet/.
+6. Do NOT use emojis in your responses.`;
 }
 
 function getDeterministicKnowledgeReply(userMessage) {
@@ -1297,7 +1302,7 @@ function getDeterministicKnowledgeReply(userMessage) {
 - **Required Documents** for each service
 - **How to Apply** through our unified single-window portal
 - **How to Track** your application status in real-time
-- **Demo Digital Wallet** top-up and simulated fee payments
+- **Simulated Citizen Wallet** top-up and fee payments
 - **Cross-Department Verification** architecture
 
 How may I assist you today?`;
@@ -1306,52 +1311,52 @@ How may I assist you today?`;
   if (msg.includes('business') || msg.includes('enterprise') || msg.includes('company') || msg.includes('registration')) {
     return `### Business Registration (Unified)
 **Department:** Municipal & Revenue Services
-**Simulated Fee:** ₹150 (Demo Wallet)
+**Simulated Fee:** ₹150 (Simulated Demo)
 **Required Documents:**
 - Address Proof (.docx / .pdf)
 - Business Name & Details
-- Citizen Identity ID
+- Identity Verification
 
 **How It Works:** Jan-Setu coordinates verifications across Identity, Revenue, Tax, and Municipal services simultaneously.
-👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=business-reg)`;
+**Apply now:** Visit [Application Submission](/pages/application/?serviceId=business-reg)`;
   }
 
   if (msg.includes('income') || msg.includes('salary') || msg.includes('certificate')) {
     return `### Income Certificate Issuance
 **Department:** Revenue Service
-**Simulated Fee:** ₹50 (Demo Wallet)
+**Simulated Fee:** ₹50 (Simulated Demo)
 **Required Documents:**
-- Income Proof / Salary Slip (Form 16 or Declaration)
+- Income Declaration / Salary Slip
 - Residence / Address Proof
-- Citizen Identity ID
+- Citizen Identity Verification
 
 **How It Works:** Fast-track verification coordinating Revenue and Identity records.
-👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=income-cert)`;
+**Apply now:** Visit [Application Submission](/pages/application/?serviceId=income-cert)`;
   }
 
   if (msg.includes('trade') || msg.includes('license') || msg.includes('shop')) {
     return `### Trade License Renewal
 **Department:** Municipal Service
-**Simulated Fee:** ₹250 (Demo Wallet)
+**Simulated Fee:** ₹250 (Simulated Demo)
 **Required Documents:**
 - Establishment Lease Agreement (.pdf)
 - Safety Declaration / Clearance
-- Prior License ID
+- Prior License Number
 
 **How It Works:** Automatic municipal zoning check and tax status verification.
-👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=trade-license)`;
+**Apply now:** Visit [Application Submission](/pages/application/?serviceId=trade-license)`;
   }
 
   if (msg.includes('property') || msg.includes('tax') || msg.includes('clearance')) {
     return `### Property Tax Clearance
 **Department:** Tax Service
-**Simulated Fee:** ₹100 (Demo Wallet)
+**Simulated Fee:** ₹100 (Simulated Demo)
 **Required Documents:**
 - Property Assessment ID
-- Last Property Assessment Receipt
+- Last Assessment Receipt
 
 **How It Works:** Automated query to Tax Service and local Revenue records.
-👉 **Apply now:** Visit [Application Submission](/pages/application/?serviceId=property-tax-clearance)`;
+**Apply now:** Visit [Application Submission](/pages/application/?serviceId=property-tax-clearance)`;
   }
 
   if (msg.includes('track') || msg.includes('status') || msg.includes('application id') || msg.includes('js-2026')) {
@@ -1359,32 +1364,42 @@ How may I assist you today?`;
 1. Go to the **[Application Tracker](/pages/tracking/)**.
 2. Enter your **Application Tracking ID** (e.g., \`JS-2026-001\`, \`JS-2026-002\`, or \`JS-2026-003\`).
 3. Click **Track Status** to inspect:
-   - Live stage progress (Submission &rarr; Identity &rarr; Revenue &rarr; Tax &rarr; Municipal &rarr; Completion)
+   - Live stage progress (Submission -> Identity -> Revenue -> Tax -> Municipal -> Completion)
    - Supporting document verification state
    - Cross-department orchestration logs
-   - Payment status & Demo Wallet receipt`;
+   - Payment status & simulated wallet receipt`;
   }
 
   if (msg.includes('wallet') || msg.includes('pay') || msg.includes('money') || msg.includes('balance') || msg.includes('topup') || msg.includes('top-up') || msg.includes('fee')) {
-    return `### Simulated Digital Wallet / Payment
-Jan-Setu includes a built-in **Demo Digital Wallet** for simulated fee settlements:
+    return `### Simulated Citizen Wallet & Payments
+Jan-Setu includes an integrated **Simulated Citizen Wallet** for demo fee settlements:
 - **Balance & Top-Up:** You start with a sample demo balance (₹1,000) and can top up demo funds anytime.
 - **Pay Fees:** You can settle simulated service application fees directly.
 - **Transaction History:** All simulated credit and debit transactions are recorded with downloadable demo receipts.
-- **Disclaimer:** This is a strictly simulated demo feature and involves **no real money or bank accounts**.
+- **Disclaimer:** This is a strictly simulated demo feature and involves **no real money or banking credentials**.
 
-👉 **Access Wallet:** Visit the **[Demo Wallet](/pages/wallet/)** page.`;
+**Access Wallet:** Click the **Wallet icon** in the top navigation or visit the **[Wallet](/pages/wallet/)** page.`;
   }
 
   if (msg.includes('document') || msg.includes('upload') || msg.includes('proof')) {
     return `### Required Documents Overview
 Depending on your service:
-- **Business Registration:** AddressProof.docx/.pdf, Business Name, Citizen ID.
-- **Income Certificate:** Salary Slip / Form 16 (.pdf), Residence Proof.
-- **Trade License:** Shop Lease Agreement (.pdf), Safety Declaration.
-- **Property Tax Clearance:** Property Assessment ID & Tax Receipt.
+- **Business Registration:** Address Proof (.docx/.pdf), Business Name, Identity Verification.
+- **Income Certificate:** Income Declaration, Residence Proof, Citizen Identity.
+- **Trade License:** Establishment Lease (.pdf), Safety Declaration, Prior License Number.
+- **Property Tax Clearance:** Property Assessment ID, Last Assessment Receipt.
 
 You can upload supporting documents during application submission or attach them later on the **[Application Tracker](/pages/tracking/)**.`;
+  }
+
+  if (msg.includes('apply') || msg.includes('how to apply') || msg.includes('submit application') || msg.includes('start application')) {
+    return `### How to Apply for a Jan-Setu Service
+1. **Choose a Service:** Explore our catalog on the **[Services Catalog](/pages/services/)**.
+2. **Open Application:** Go to the **[Application Submission](/pages/application/)** page.
+3. **Fill Citizen Details:** Provide applicant information and service-specific requirements.
+4. **Grant Consent:** Explicitly consent to federated verification across relevant department adapters.
+5. **Receive Tracking ID:** Once submitted, you will receive a unique tracking ID (e.g., \`JS-2026-001\`) to monitor real-time orchestration progress.
+6. **Settle Fee:** Settle the statutory fee using your **[Citizen Wallet](/pages/wallet/)**.`;
   }
 
   if (msg.includes('service') || msg.includes('catalog') || msg.includes('all services')) {
@@ -1394,7 +1409,7 @@ You can upload supporting documents during application submission or attach them
 3. **Trade License Renewal:** Commercial operating permit clearance.
 4. **Property Tax Clearance:** Municipal property tax assessment and clearance.
 
-👉 **Explore full catalog:** Visit **[Services Catalog](/pages/services/)**.`;
+**Explore full catalog:** Visit **[Services Catalog](/pages/services/)**.`;
   }
 
   if (msg.includes('how does it work') || msg.includes('orchestration') || msg.includes('interoperability') || msg.includes('architecture')) {
@@ -1411,7 +1426,7 @@ I can help you with:
 - **Services:** Ask about Business Registration, Income Certificate, Trade License, or Property Tax.
 - **Application:** Guidance on how to apply and required documents.
 - **Tracking:** How to track Application IDs like \`JS-2026-001\`.
-- **Demo Wallet:** How to use the simulated digital wallet for demo fee payments.
+- **Citizen Wallet:** How to use the simulated wallet for fee payments.
 - **Architecture:** How cross-department verification works.
 
 What specific information would you like to know?`;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Jan-Setu AI Citizen Assistant - Frontend Logic
  * Implements interactive conversational UI with server-side AI integration & fallback
  */
@@ -44,14 +44,17 @@ function initChatbot() {
     chip.addEventListener('click', () => {
       const query = chip.getAttribute('data-query');
       if (query && !isProcessing) {
-        input.value = query;
-        updateCharCount();
-        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        if (input) {
+          input.value = query;
+          updateCharCount();
+        }
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
       }
     });
   });
 
-  // Scroll to bottom of initial message
   scrollToBottom();
 }
 
@@ -60,11 +63,12 @@ function updateCharCount() {
   const counter = document.getElementById('char-count');
   if (input && counter) {
     const len = input.value.length;
-    counter.textContent = ${len}/2000;
+    counter.textContent = `${len}/2000`;
   }
 }
 
 function autoResizeInput(el) {
+  if (!el) return;
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
@@ -82,13 +86,13 @@ async function handleChatSubmit(e) {
 
   const input = document.getElementById('chat-input');
   const btnSubmit = document.getElementById('btn-chat-send');
-  const message = input.value.trim();
+  if (!input) return;
 
+  const message = input.value.trim();
   if (!message) return;
 
   // Append citizen message to UI
   appendMessage('user', message, 'Citizen');
-  conversationHistory.push({ role: 'user', content: message });
 
   // Clear input
   input.value = '';
@@ -99,7 +103,7 @@ async function handleChatSubmit(e) {
   isProcessing = true;
   if (btnSubmit) {
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = <span class="loading-spinner"></span>;
+    btnSubmit.innerHTML = '<span class="loading-spinner"></span>';
   }
 
   // Show typing indicator
@@ -107,19 +111,20 @@ async function handleChatSubmit(e) {
   scrollToBottom();
 
   try {
+    // Send previous history with current query
     const res = await JanSetuAPI.sendChatMessage(message, conversationHistory);
     removeTypingIndicator(typingId);
+
+    // Track user message in history
+    conversationHistory.push({ role: 'user', content: message });
 
     if (res && res.reply) {
       appendMessage('assistant', res.reply, 'Jan-Setu Assistant', res.source);
       conversationHistory.push({ role: 'assistant', content: res.reply });
     } else {
-      appendMessage(
-        'assistant',
-        'I am unable to answer this query at the moment. Please refer to our [Services Catalog](/pages/services/) or [Application Tracker](/pages/tracking/).',
-        'Jan-Setu Assistant',
-        'fallback'
-      );
+      const fallbackReply = 'I am unable to process this query at the moment. Please refer to our [Services Catalog](/pages/services/) or [Application Tracker](/pages/tracking/).';
+      appendMessage('assistant', fallbackReply, 'Jan-Setu Assistant', 'knowledge-base');
+      conversationHistory.push({ role: 'assistant', content: fallbackReply });
     }
   } catch (err) {
     console.error('Chat submit error:', err);
@@ -128,16 +133,16 @@ async function handleChatSubmit(e) {
       'assistant',
       'A network error occurred while connecting to the Jan-Setu AI Service. Please check your connection and try again.',
       'Jan-Setu Assistant',
-      'error'
+      'knowledge-base'
     );
   } finally {
     isProcessing = false;
     if (btnSubmit) {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = Send;
+      btnSubmit.innerHTML = 'Send';
     }
     scrollToBottom();
-    input.focus();
+    if (input) input.focus();
   }
 }
 
@@ -147,26 +152,34 @@ function appendMessage(role, text, senderName, source = null) {
 
   const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const row = document.createElement('div');
-  row.className = chat-message-row ;
+  row.className = `chat-message-row ${role}`;
 
   const formattedContent = parseSimpleMarkdown(text);
-  const sourceBadge = source ? <span class="msg-source-badge"></span> : '';
+  let sourceBadge = '';
+  if (source === 'ai') {
+    sourceBadge = '<span class="msg-source-badge ai-source">AI ASSISTANT</span>';
+  } else if (source) {
+    sourceBadge = '<span class="msg-source-badge kb-source">KNOWLEDGE BASE</span>';
+  }
 
-  row.innerHTML = 
-    <div class="msg-avatar" title="">
-      
+  const avatarText = role === 'user' ? 'ME' : 'JS';
+  const avatarTitle = role === 'user' ? 'Citizen' : 'Jan-Setu Assistant';
+
+  row.innerHTML = `
+    <div class="msg-avatar" title="${avatarTitle}">
+      ${avatarText}
     </div>
     <div class="msg-bubble-container">
       <div class="msg-bubble">
-        
+        ${formattedContent}
       </div>
       <div class="msg-meta">
-        <span></span>
-        
-        
+        <span>${timeStr}</span>
+        ${sourceBadge}
+        <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 6px; font-size: 0.68rem;" onclick="copyMessageText(this)">Copy</button>
       </div>
     </div>
-  ;
+  `;
 
   container.appendChild(row);
   scrollToBottom();
@@ -176,11 +189,11 @@ function showTypingIndicator() {
   const container = document.getElementById('chat-messages');
   if (!container) return null;
 
-  const id = 	yping-;
+  const id = `typing-${Date.now()}`;
   const row = document.createElement('div');
   row.id = id;
   row.className = 'chat-message-row assistant';
-  row.innerHTML = 
+  row.innerHTML = `
     <div class="msg-avatar">JS</div>
     <div class="msg-bubble-container">
       <div class="msg-bubble" style="padding: 0.5rem 0.8rem;">
@@ -191,7 +204,7 @@ function showTypingIndicator() {
         </div>
       </div>
     </div>
-  ;
+  `;
 
   container.appendChild(row);
   return id;
@@ -209,13 +222,13 @@ function clearChat() {
 
   conversationHistory = [];
   container.innerHTML = '';
-  
+
   // Re-append default welcome message
   appendMessage(
     'assistant',
-    'Namaste! Welcome to **Jan-Setu Citizen Assistant**.\n\nI can assist you with understanding our unified public services, required documents, tracking your application across departments, and using our simulated Demo Wallet.\n\nHow can I help you today?',
+    'Namaste! Welcome to **Jan-Setu Citizen Assistant**.\n\nI can assist you with understanding our unified public services, required documents, tracking your application across departments, and using our simulated Citizen Wallet.\n\nHow can I help you today?',
     'Jan-Setu Assistant',
-    'knowledge_base'
+    'knowledge-base'
   );
 }
 
@@ -236,59 +249,57 @@ function parseSimpleMarkdown(text) {
   if (!text) return '';
   let escaped = JanSetuUI.escapeHtml(text);
 
-  // Headers (### Header)
-  escaped = escaped.replace(/^### (.*?)$/gm, '<h4></h4>');
-  escaped = escaped.replace(/^## (.*?)$/gm, '<h3></h3>');
+  // Headers (### Header, ## Header)
+  escaped = escaped.replace(/^###\s+(.*?)$/gm, '<h4>$1</h4>');
+  escaped = escaped.replace(/^##\s+(.*?)$/gm, '<h3>$1</h3>');
 
   // Bold (**text**)
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong></strong>');
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  // Code (code)
-  escaped = escaped.replace(/([^]+)/g, '<code style="background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px;"></code>');
+  // Inline Code (`code`)
+  escaped = escaped.replace(/`([^`]+)`/g, '<code style="background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px;">$1</code>');
 
   // Markdown links ([title](url))
-  escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href=""></a>');
+  escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 
-  // Bullet items (- item or * item)
+  // Line by line processing for bullet and numbered lists
   const lines = escaped.split('\n');
   let inList = false;
+  let inNumList = false;
   let html = '';
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i].trim();
+    if (!line) {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (inNumList) { html += '</ol>'; inNumList = false; }
+      continue;
+    }
+
     const bulletMatch = line.match(/^[\*\-]\s+(.*)$/);
     const numMatch = line.match(/^(\d+)\.\s+(.*)$/);
 
     if (bulletMatch) {
-      if (!inList) {
-        html += '<ul>';
-        inList = true;
-      }
-      html += <li></li>;
+      if (inNumList) { html += '</ol>'; inNumList = false; }
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${bulletMatch[1]}</li>`;
     } else if (numMatch) {
-      if (!inList) {
-        html += '<ol>';
-        inList = true;
-      }
-      html += <li></li>;
+      if (inList) { html += '</ul>'; inList = false; }
+      if (!inNumList) { html += '<ol>'; inNumList = true; }
+      html += `<li>${numMatch[2]}</li>`;
     } else {
-      if (inList) {
-        html += '</ul>';
-        inList = false;
-      }
-      if (line.trim().length > 0) {
-        if (line.startsWith('<h3>') || line.startsWith('<h4>')) {
-          html += line;
-        } else {
-          html += <p></p>;
-        }
+      if (inList) { html += '</ul>'; inList = false; }
+      if (inNumList) { html += '</ol>'; inNumList = false; }
+      if (line.startsWith('<h3>') || line.startsWith('<h4>')) {
+        html += line;
+      } else {
+        html += `<p>${line}</p>`;
       }
     }
   }
 
-  if (inList) {
-    html += '</ul>';
-  }
+  if (inList) html += '</ul>';
+  if (inNumList) html += '</ol>';
 
   return html;
 }

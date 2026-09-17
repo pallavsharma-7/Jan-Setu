@@ -225,6 +225,9 @@ a:hover {
   white-space: nowrap;
   border-bottom: 3px solid transparent;
   transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .gov-nav-link:hover {
@@ -238,6 +241,30 @@ a:hover {
   border-bottom-color: var(--color-saffron);
   background-color: var(--color-navy-light);
   font-weight: 600;
+}
+
+.gov-nav-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wallet-nav-icon {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.gov-nav-link:hover .wallet-nav-icon,
+.gov-nav-link.active .wallet-nav-icon {
+  opacity: 1;
 }
 
 /* Official Banner Alert */

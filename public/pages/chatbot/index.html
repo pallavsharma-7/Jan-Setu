@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -39,7 +39,10 @@
         <a href="/pages/services/" class="gov-nav-link">Services</a>
         <a href="/pages/application/" class="gov-nav-link">Apply</a>
         <a href="/pages/tracking/" class="gov-nav-link">Track Application</a>
-        <a href="/pages/wallet/" class="gov-nav-link">Demo Wallet</a>
+        <a href="/pages/wallet/" class="gov-nav-link gov-nav-wallet" title="Citizen Wallet (Simulated)" aria-label="Wallet">
+          <svg class="wallet-nav-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          <span>Wallet</span>
+        </a>
         <a href="/pages/chatbot/" class="gov-nav-link active" aria-current="page">AI Assistant</a>
         <a href="/pages/dashboard/" class="gov-nav-link">Department Dashboard</a>
         <a href="/pages/audit/" class="gov-nav-link">Audit Log</a>
@@ -54,7 +57,7 @@
     <!-- Functional Prototype Disclaimer Banner -->
     <div class="proto-disclaimer" role="alert">
       <div>
-        <strong>DISCLAIMER:</strong> Jan-Setu Citizen Assistant is an intelligent prototype guidance agent. It provides contextual information about simulated public services, application steps, required documents, and demo wallet features. It does <strong>not store real credentials or connect to live citizen records</strong>.
+        <strong>DISCLAIMER:</strong> Jan-Setu Citizen Assistant is an intelligent prototype guidance agent. It provides contextual information about simulated public services, application steps, required documents, and citizen wallet features. It does <strong>not store real credentials or connect to live citizen records</strong>.
       </div>
     </div>
 
@@ -91,8 +94,8 @@
             <button type="button" class="suggestion-chip" data-query="How do I track my application status?">
               How to Track Status
             </button>
-            <button type="button" class="suggestion-chip" data-query="How does the simulated Demo Wallet work?">
-              Demo Wallet & Fees
+            <button type="button" class="suggestion-chip" data-query="How does the simulated Citizen Wallet work?">
+              Citizen Wallet & Fees
             </button>
             <button type="button" class="suggestion-chip" data-query="How does cross-department verification work?">
               Federated Orchestration
@@ -113,13 +116,13 @@
                   <li>Available public services & required documents</li>
                   <li>How our 4 simulated department adapters verify records in parallel</li>
                   <li>How to submit an application and track your Tracking ID (e.g. <code>JS-2026-001</code>)</li>
-                  <li>How to use our <strong>Demo Digital Wallet</strong> for simulated fee payments</li>
+                  <li>How to use our <strong>Simulated Citizen Wallet</strong> for fee payments</li>
                 </ul>
                 <p>How may I assist you today?</p>
               </div>
               <div class="msg-meta">
                 <span>System Ready</span>
-                <span class="msg-source-badge">KNOWLEDGE BASE</span>
+                <span class="msg-source-badge kb-source">KNOWLEDGE BASE</span>
                 <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 6px; font-size: 0.68rem;" onclick="copyMessageText(this)">Copy</button>
               </div>
             </div>
@@ -169,7 +172,7 @@
           <li><a href="/pages/services/">Services Catalog</a></li>
           <li><a href="/pages/application/">Application Submission</a></li>
           <li><a href="/pages/tracking/">Application Tracker</a></li>
-          <li><a href="/pages/wallet/">Demo Wallet</a></li>
+          <li><a href="/pages/wallet/">Citizen Wallet</a></li>
           <li><a href="/pages/chatbot/">AI Assistant</a></li>
           <li><a href="/pages/dashboard/">Department Dashboard</a></li>
           <li><a href="/pages/audit/">Audit Log</a></li>
